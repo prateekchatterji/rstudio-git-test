@@ -22,7 +22,7 @@ Approach -- THe data is cleaned,preprocessed and subject to K-means clustering.
 Caveat -- It is assumed that customers of the dataset are indeed different from each other. Practiaclly, such cases are rare. 
 
 
-```{r library, warning=FALSE, message=FALSE}
+```{r library, warning=FALSE, message=FALSE, echo = FALSE}
 options(java.parameters = "-Xmx1024m")
 
 library(tidyverse)
@@ -45,7 +45,7 @@ library(rgl)
 
 ### Import Data
 
-```{r Importing Data , warning=FALSE, message=FALSE}
+```{r Importing Data , warning=FALSE, message=FALSE, echo = FALSE}
 # Import data
 # https://archive.ics.uci.edu/ml/datasets/Online+Retail
 library(XLConnect)
@@ -71,7 +71,7 @@ str(data)
 ### Cleaning Data
 Missing Data removal: ID numbers are unavailable for a number of data rows. Remove any observations with missing ID numbers. Analysis would be conducted at customer level. 
 
-```{r Cleaning data , warning=FALSE, message=FALSE}
+```{r Cleaning data , warning=FALSE, message=FALSE, echo = FALSE}
 length(unique(data$CustomerID))
 sum(is.na(data$CustomerID))
 data <- subset(data, !is.na(data$CustomerID))
@@ -80,7 +80,7 @@ data <- subset(data, !is.na(data$CustomerID))
 ### Tidying Data
 Limiting date range to one full year.
 
-```{r Tidying Data, warning=FALSE, message=FALSE}
+```{r Tidying Data, warning=FALSE, message=FALSE, echo = FALSE}
 range(data$InvoiceDate, na.rm = TRUE)
 data <- subset(data, InvoiceDate >= "2010-12-09")
 range(data$InvoiceDate)
@@ -90,7 +90,7 @@ range(data$InvoiceDate)
 ### Adding Geographic Constraints
 Using on United Kingdom's data share
 
-```{r Adding Geographic Constraints, warning=FALSE, message=FALSE}
+```{r Adding Geographic Constraints, warning=FALSE, message=FALSE, echo = FALSE}
 table(data$Country)
 data <- subset(data, Country == "United Kingdom")
 ```
@@ -98,7 +98,7 @@ data <- subset(data, Country == "United Kingdom")
 
 ### Complete Dataset
 
-```{r Complete Dataset, warning=FALSE, message=FALSE}
+```{r Complete Dataset, warning=FALSE, message=FALSE, echo = FALSE}
 length(unique(data$InvoiceNo))
 rRow <- length(unique(data$CustomerID))
 ```
@@ -112,7 +112,7 @@ We now have a dataset of 19,140 unique invoices and 3,891 unique customers.
 ### Identify returns
 Invoice purchases are different from Invoice of Returns. Adjust accordingly.
 
-```{r Identify Returns , warning=FALSE, message=FALSE}
+```{r Identify Returns , warning=FALSE, message=FALSE, echo = FALSE}
 data$item.return <- grepl("C", data$InvoiceNo, fixed=TRUE) 
 data$purchase.invoice <- ifelse(data$item.return=="TRUE", 0, 1)
 
@@ -121,7 +121,7 @@ data$purchase.invoice <- ifelse(data$item.return=="TRUE", 0, 1)
 ## RFM Variables
 Create Customer level Dataset
 
-```{r Create customer level dataset, warning=FALSE, message=FALSE}
+```{r Create customer level dataset, warning=FALSE, message=FALSE, echo = FALSE}
 customers <- as.data.frame(unique(data$CustomerID))
 names(customers) <- "CustomerID"
 
@@ -130,7 +130,7 @@ names(customers) <- "CustomerID"
 
 Create Recency Dataset
 
-```{r Recenc, warning=FALSE, message=FALSE}
+```{r Recenc, warning=FALSE, message=FALSE, echo = FALSE}
 data$recency <- as.Date("2011-12-10") - as.Date(data$InvoiceDate)
 
 # remove returns so only consider the data of most recent *purchase*
@@ -151,7 +151,7 @@ customers$recency <- as.numeric(customers$recency)
 
 Create Frequency Dataset
 
-```{r Frequency, warning=FALSE, message=FALSE}
+```{r Frequency, warning=FALSE, message=FALSE, echo = FALSE}
 customer.invoices <- subset(data, select = c("CustomerID","InvoiceNo", "purchase.invoice"))
 customer.invoices <- customer.invoices[!duplicated(customer.invoices), ]
 customer.invoices <- customer.invoices[order(customer.invoices$CustomerID),]
@@ -176,7 +176,7 @@ customers <- subset(customers, frequency > 0)
 
 Create Monetary Value Dataset
 
-```{r Monetary Value, warning=FALSE, message=FALSE}
+```{r Monetary Value, warning=FALSE, message=FALSE, echo = FALSE}
 # Total spent on each item on an invoice
 data$Amount <- data$Quantity * data$UnitPrice
 
@@ -203,7 +203,7 @@ In this context, it implies that ~80% of sales would be produced by the top ~20%
 To make a point about outliers below, I create some simple segments here by looking at the top customers who produced 80% of annual sales for the year. In this dataset, 80% of the annual sales are produced by the top 29% of customers, so the percentage isn't quite 20%, but it's not that far off and it does illustrate that there's a smallish segment producing the bulk of the value.
 
 
-```{r Pareto, warning=FALSE, message=FALSE}
+```{r Pareto, warning=FALSE, message=FALSE, echo = FALSE}
 customers <- customers[order(-customers$monetary),] #Remove Customers who have not made any purchases in the past year
 
 # Apply Pareto Principle (80/20 Rule)
@@ -225,7 +225,7 @@ customers <- customers[order(customers$CustomerID),]
 k-means clustering requires continuous variables and works best with relatively normally-distributed, standardized input variables. Standardizing the input variables is quite important; otherwise, input variables with larger variances will have commensurately greater influence on the results. Below, I transform our three input variables to reduce positive skew and then standardize them as z-scores.
 
 
-```{r Preprocess Data, warning=FALSE, message=FALSE}
+```{r Preprocess Data, warning=FALSE, message=FALSE, echo = FALSE}
 # Log-transform positively-skewed variables
 customers$recency.log <- log(customers$recency)
 customers$frequency.log <- log(customers$frequency)
@@ -243,7 +243,7 @@ customers$monetary.z <- scale(customers$monetary.log, center=TRUE, scale=TRUE)
 
 Visualize data 
 
-```{r Visualize data, warning=FALSE, message=FALSE}
+```{r Visualize data, warning=FALSE, message=FALSE, echo = FALSE}
 
 
 library(ggplot2)
@@ -264,7 +264,7 @@ scatter.1
 This first graph uses the variables' original metrics and is almost completely uninterpretable.  There's a clump of data points in the lower left-hand corner of the plot, and then a few outliers. This is why we log-transformed the input variables.
 
 
-```{r Vizualize Data log Transformed, warning=FALSE, message=FALSE}
+```{r Vizualize Data log Transformed, warning=FALSE, message=FALSE, echo = FALSE}
 # Log-transformed
 scatter.2 <- ggplot(customers, aes(x = frequency.log, y = monetary.log))
 scatter.2 <- scatter.2 + geom_point(aes(colour = recency.log, shape = pareto))
@@ -281,7 +281,7 @@ Now we can see a scattering of high-value, high-frequency customers in the top, 
 ### Handling outliers
 
 One question we might have about those dots in the bottom, left-hand corner is how many customers they represent. The following code investigates them a little more thoroughly.
-```{r Handling OUtliers, warning=FALSE, message=FALSE}
+```{r Handling OUtliers, warning=FALSE, message=FALSE, echo = FALSE}
 
 
 
@@ -296,7 +296,7 @@ remove(delete, delete2, no.value.custs)
 The no-value customers are all customers who returned everything they bought. k-means clustering is sensitive to outliers. Often, outliers will huddle up clustered together in a seld contained grroup. For our experiment, these outliers are deliberately included.
 
 
-```{r Scaled Variables, warning=FALSE, message=FALSE}
+```{r Scaled Variables, warning=FALSE, message=FALSE, echo = FALSE}
 
 
 # Scaled variables
@@ -317,7 +317,7 @@ remove(scatter.1, scatter.2, scatter.3)
 ## Determine number of clusters / run k-means
 
 
-```{r Determine number of clusters, warning=FALSE, message=FALSE}
+```{r Determine number of clusters, warning=FALSE, message=FALSE, echo = FALSE}
 preprocessed <- customers[,9:11]
 j <- 10 # specify the maximum number of clusters you want to try out
 
@@ -393,7 +393,7 @@ As we move beyond 5 clusters, the graphs become increasingly hard to interpret v
 
 ### Skree Plot 
 
-```{r Elbow Skree Plot, warning=FALSE, message=FALSE}
+```{r Elbow Skree Plot, warning=FALSE, message=FALSE, echo = FALSE}
 library(ggplot2)
 library(scales)
 
@@ -427,7 +427,7 @@ Lastly, we can use NbClust package that will look at multitude of different fit 
 For computational stress, the section is commented out.
 
 
-```{r NbClust, warning=FALSE, message=FALSE}
+```{r NbClust, warning=FALSE, message=FALSE, echo = FALSE}
 
 # library(NbClust)
 # set.seed(1)
@@ -450,7 +450,7 @@ The greatest number of indices recommend the 2-cluster solution.
 ## Three-Dimensional Representation of Clusters
 
 
-```{r Plot clusters in 3D, warning=FALSE, message=FALSE}
+```{r Plot clusters in 3D, warning=FALSE, message=FALSE, echo = FALSE}
 colors <- c('red','orange','green3','deepskyblue','blue','darkorchid4','violet','pink1','tan3','black')
 
 library(car)
@@ -471,9 +471,9 @@ scatter3d(x = customers$frequency.log,
           grid = TRUE,
           axis.col = c("black", "black", "black"))
 
-
-
-
 remove(colors)
 ```
 
+PS: 3 Cluster Model
+
+![3 Cluster Model](https://github.com/prateekchatterji/rstudio-git-test/raw/master/3ClusterModelCapture.PNG)
