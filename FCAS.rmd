@@ -1,0 +1,746 @@
+---
+title: "Amtrack Ridership Forecasting"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r Amtrak Fig 2-3, echo=FALSE, warning=FALSE, message=FALSE}
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991,1), end = c(2004, 3), freq = 12)
+
+# Figure 2-3
+plot(ridership.ts, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300), bty = "l")
+```
+Line plot of Ridership  - The dataset
+
+
+#Linear Fitting and Smoothening
+```{r Amtrak Fig 2-6, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991,1), end = c(2004, 3), freq = 12)
+ridership.lm <- tslm(ridership.ts ~ trend + I(trend^2))
+
+# Figure 2-6
+par(mfrow = c(2, 1))
+plot(ridership.ts, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300), bty = "l", main = "Fitted Trend to Timeseries")
+lines(ridership.lm$fitted, lwd = 2)
+ridership.ts.zoom <- window(ridership.ts, start = c(1997, 1), end = c(2000, 12))
+plot(ridership.ts.zoom, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300), bty = "l")
+
+```
+
+# Partitioning
+
+```{r Amtrak Fig 3-1, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+# Figure 3-1
+plot(ridership.ts, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25))
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1), digits = 2))
+lines(c(2004.25 - 3 , 2004.25 - 3), c(0, 3500))
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3,2450,1991.25,2450,code=3,length=0.1,lwd=1,angle=30)
+arrows(2004.5 - 3,2450,2004,2450,code=3,length=0.1,lwd=1,angle=30)
+arrows(2004.5,2450,2006,2450,code=3,length=0.1,lwd=1,angle=30)
+
+```
+
+```{r Amtrak Fig 3-2, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+stepsAhead <- 36
+nTrain <- length(ridership.ts) - stepsAhead
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + stepsAhead))
+ridership.lm <-  tslm(train.ts ~ trend + I(trend^2))
+ridership.lm.pred <- forecast(ridership.lm, h = stepsAhead, level = 0)
+
+# Figure 3-2
+plot(ridership.lm.pred, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1))) 
+lines(ridership.lm$fitted, lwd = 2)
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+```
+
+
+```{r Amtrak Fig 3-3, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+stepsAhead <- 36
+nTrain <- length(ridership.ts) - stepsAhead
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + stepsAhead))
+ridership.lm <-  tslm(train.ts ~ trend + I(trend^2))
+ridership.lm.pred <- forecast(ridership.lm, h = stepsAhead, level = 0)
+
+# Figure 3-3
+plot(ridership.lm.pred$residuals, ylim = c(-400, 500),  ylab = "Residuals", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(valid.ts - ridership.lm.pred$mean, lwd = 1)
+lines(c(2004.25 - 3, 2004.25 - 3), c(-500, 3500))
+lines(c(2004.25, 2004.25), c(-500, 3500))
+text(1996.25, 500, "Training")
+text(2002.75, 500, "Validation")
+text(2005.25, 500, "Future")
+arrows(2004 - 3, 450, 1991.25, 450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 450, 2004, 450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 450, 2006, 450, code = 3, length = 0.1, lwd = 1, angle = 30)
+```
+
+```{r Amtrak Fig 3-4, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+stepsAhead <- 36
+nTrain <- length(ridership.ts) - stepsAhead
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + stepsAhead))
+ridership.lm <-  tslm(train.ts ~ trend + I(trend^2))
+ridership.lm.pred <- forecast(ridership.lm, h = stepsAhead, level = 0)
+names(ridership.lm.pred)
+
+# Figure 3-4
+hist(ridership.lm.pred$residuals,  ylab = "Frequency", xlab = "Forecast Error", bty = "l", main = "")
+
+```
+
+```{r Amtrak Fig 3-5, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+ridership.lm <-  tslm(train.ts ~ trend + I(trend^2))
+ridership.lm.pred <- forecast(ridership.lm, h = nValid, level = 95)
+
+# Figure 3-5
+plot(ridership.lm.pred, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(ridership.lm$fitted, lwd = 2)
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+```
+
+```{r Amtrak Fig 3-6, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+fixed.nValid <- 36
+fixed.nTrain <- length(ridership.ts) - fixed.nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, fixed.nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, fixed.nTrain + 1), end = c(1991, fixed.nTrain + fixed.nValid))
+naive.fixed <- naive(train.ts, h = fixed.nValid)
+naive.roll <- ts(Amtrak.data$Ridership[fixed.nTrain:(fixed.nTrain + fixed.nValid - 1)], start = c(1991, fixed.nTrain + 1), end = c(1991, fixed.nTrain + fixed.nValid), freq = 12)
+
+# Figure 3-6
+plot(train.ts, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(naive.fixed$mean, lwd = 2, col = "blue", lty = 2)
+lines(naive.roll, lwd = 2, col = "blue", lty = 2)
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+
+```
+
+# Predictions
+
+```{r Amtrak Fig 5-2, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+ma.trailing <- rollmean(ridership.ts, k = 12, align = "right")
+ma.centered <- ma(ridership.ts, order = 12)
+
+# Figure 5-2
+plot(ridership.ts, ylim = c(1300, 2200),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", 
+     xlim = c(1991,2004.25), main = "")
+axis(1, at = seq(1991, 2004.25, 1), labels = format(seq(1991, 2004.25, 1)))
+lines(ma.centered, lwd = 2)
+lines(ma.trailing, lwd = 2, lty = 2)
+legend(1994,2200, c("Ridership","Centered Moving Average", "Trailing Moving Average"), lty=c(1,1,2), lwd=c(1,2,2), bty = "n")  
+
+```
+
+```{r Amtrak Fig 5-3, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+ma.trailing <- rollmean(train.ts, k = 12, align = "right")
+last.ma <- tail(ma.trailing, 1)
+ma.trailing.pred <- ts(rep(last.ma, nValid), start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid), freq = 12)
+
+# Figure 5-3
+plot(train.ts, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(ma.trailing, lwd = 2) 
+lines(ma.trailing.pred, lwd = 2, col = "blue", lty = 2) 
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+
+
+
+
+```
+
+```{r Amtrak Fig 5-4, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+# Figure 5-4
+par(mfrow = c(2,2))
+plot(ridership.ts, ylab = "Ridership", xlab = "Time", bty = "l", xlim = c(1991,2004.25), main = "Ridership")
+plot(diff(ridership.ts, lag = 12), ylab = "Lag-12", xlab = "Time", bty = "l", xlim = c(1991,2004.25), main = "Lag-12 Difference")
+plot(diff(ridership.ts, lag = 1), ylab = "Lag-1", xlab = "Time", bty = "l", xlim = c(1991,2004.25), main = "Lag-1 Difference")
+plot(diff(diff(ridership.ts, lag = 12), lag = 1), ylab = "Lag-12, then Lag-1", xlab = "Time", bty = "l", xlim = c(1991,2004.25), main = "Twice-Differenced (Lag-12, Lag-1)")
+dev.off()
+
+ridership.deseasonalized <- diff(ridership.ts, lag = 12)
+summary(tslm(ridership.deseasonalized ~ trend))
+
+```
+
+```{r Amtrak Fig 5-5 Tab 5-1, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+diff.twice.ts <- diff(diff(ridership.ts, lag = 12), lag = 1)
+nValid <- 36
+nTrain <- length(diff.twice.ts) - nValid
+train.ts <- window(diff.twice.ts, start = c(1992, 2), end = c(1992, nTrain + 1))
+valid.ts <- window(diff.twice.ts, start = c(1992, nTrain + 2), end = c(1992, nTrain + 1 + nValid))
+
+ses <- ets(train.ts, model = "ANN", alpha = 0.2)
+ses.pred <- forecast(ses, h = nValid, level = 0)
+
+# Figure 5-5
+plot(ses.pred, ylim = c(-250, 300),  ylab = "Ridership (Twice-Differenced)", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(ses.pred$fitted, lwd = 2, col = "blue")
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(-250, 350)) 
+lines(c(2004.25, 2004.25), c(-250, 350))
+text(1996.25, 275, "Training")
+text(2002.75, 275, "Validation")
+text(2005.25, 275, "Future")
+arrows(2004 - 3, 245, 1991.5, 245, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 245, 2004, 245, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 245, 2006, 245, code = 3, length = 0.1, lwd = 1, angle = 30)
+dev.off()
+
+
+# Table 5.1
+ses.opt <- ets(train.ts, model = "ANN")
+ses.opt.pred <- forecast(ses.opt, h = nValid, level = 0)
+ses.opt
+accuracy(ses.pred, valid.ts)
+accuracy(ses.opt.pred, valid.ts)
+
+
+# Miscellaneous calculations below.
+ar1 <- auto.arima(train.ts)
+ar1
+arima.pred <- forecast(ar1, h = nValid)
+
+diff.once.ts <- diff(ridership.ts, lag = 12)
+diff.df <- data.frame("Time" = as.vector(time(ridership.ts)), "None" = as.vector(ridership.ts), "Once" = c(rep(NA, 12), as.vector(diff.once.ts)), "Twice" = c(rep(NA, 13), as.vector(diff.twice.ts)), "Pred" = c(rep(NA, length(ridership.ts) - nValid), as.vector(ses.pred$mean)))
+
+rts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+rets <- ets(rts)
+rets
+rets.pred <- forecast(rets, h = nValid)
+plot(rets.pred)
+
+initial.diff.once <- window(diff.once.ts, start = c(2001, 3), end = c(2001, 3))
+once.pred <- as.vector(diffinv(arima.pred$mean, lag = 1, xi = initial.diff.once))
+once.pred[2:37]
+initial.values <- window(ridership.ts, start = c(2000, 4), end = c(2001, 3))
+as.vector(diffinv(once.pred[2:37], lag = 12, xi = initial.values))
+final.pred <- diffinv(once.pred[2:37], lag = 12, xi = initial.values)
+final.pred[13:48]
+accuracy(final.pred[13:48], ridership.ts[124:159])
+
+ets(ridership.ts)$states
+
+```
+
+
+```{r Amtrak Fig 5-6 Tab 5-2 5-4 5-5, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+hwin <- ets(train.ts, model = "MAA")
+hwin.pred <- forecast(hwin, h = nValid, level = 0)
+
+# Figure 5.6
+plot(hwin.pred, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(hwin.pred$fitted, lwd = 2, col = "blue")
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+# Table 5.2
+hwin
+hwin$states[1, ]  # Initial states
+hwin$states[nrow(hwin$states), ]  # Final states
+hwin$states
+
+# Table 5.4
+ets.opt <- ets(train.ts, restrict = FALSE, allow.multiplicative.trend = TRUE)
+
+# Table 5.5
+ets.opt.pred <- forecast(ets.opt, h = nValid, level = 0)
+plot(ets.opt.pred)
+accuracy(hwin.pred, valid.ts)
+accuracy(ets.opt.pred, valid.ts)
+
+
+
+```
+
+
+# Smoothening 
+```{r Amtrak Fig 6-2 Tab 6-1, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm <- tslm(train.ts ~ trend)
+
+# Figure 6.2
+plot(train.ts, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300), bty = "l")
+lines(train.lm$fitted, lwd = 2)
+
+# Table 6.1
+summary(train.lm)
+
+```
+## Box-Cox Transformation
+```{r Amtrak Fig 6-3 6-5, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm.expo.trend <- tslm(train.ts ~ trend, lambda = 0)
+train.lm.expo.trend.pred <- forecast(train.lm.expo.trend, h = nValid, level = 0)
+
+train.lm.linear.trend <- tslm(train.ts ~ trend, lambda = 1)
+train.lm.linear.trend.pred <- forecast(train.lm.linear.trend, h = nValid, level = 0)
+
+# Figures 6-3/6-5
+plot(train.lm.expo.trend.pred, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.lm.expo.trend.pred$fitted, lwd = 2, col = "blue")  # Added in 6-5
+lines(train.lm.linear.trend.pred$fitted, lwd = 2, col = "black", lty = 3)
+lines(train.lm.linear.trend.pred$mean, lwd = 2, col = "black", lty = 3)
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+
+BoxCox(train.ts, 0)
+
+```
+##  Smoothening with various Permuations of Interaction Terms
+
+```{r Amtrak Tab 6-2, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm.poly.trend <- tslm(train.ts ~ trend + I(trend^2))
+summary(train.lm.poly.trend)
+
+
+
+```
+
+```{r Amtrak Tab 6-3 Fig 6-7 Tab 6-5, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+# Table 6.3
+train.lm.season <- tslm(train.ts ~ season)
+summary(train.lm.season)
+train.lm.season.pred <- forecast(train.lm.season, h = nValid, level = 0)
+
+# Figure 6-7
+par(mfrow = c(2,1))
+plot(train.lm.season.pred, ylim = c(1300, 2625),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.lm.season.pred$fitted, lwd = 2, col = "blue")
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2600, "Training")
+text(2002.75, 2600, "Validation")
+text(2005.25, 2600, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+plot(train.lm.season.pred$residuals, ylim = c(-400, 550),  ylab = "Residuals", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.ts - train.lm.season.pred$fitted)
+lines(valid.ts - train.lm.season.pred$mean)
+lines(c(2004.25 - 3, 2004.25 - 3), c(-500, 3500))
+lines(c(2004.25, 2004.25), c(-500, 3500))
+text(1996.25, 525, "Training")
+text(2002.75, 525, "Validation")
+text(2005.25, 525, "Future")
+arrows(2004 - 3, 425, 1991.25, 425, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 425, 2004, 425, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 425, 2006, 425, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+
+# Table 6.5
+train.lm.trig <- tslm(train.ts ~ trend + I(sin(2*pi*trend/12)) + I(cos(2*pi*trend/12)))
+train.lm.trig.pred <- forecast(train.lm.trig, h = nValid, level = 0)
+
+plot(train.lm.trig.pred, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.lm.trig.pred$fitted, lwd = 2, col = "blue")
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2500, "Training")
+text(2002.75, 2500, "Validation")
+text(2005.25, 2500, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+summary(train.lm.trig)
+
+```
+
+```{r Amtrak Tab 6-4 Fig 6-8, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
+train.lm.trend.season.pred <- forecast(train.lm.trend.season, h = nValid, level = 0)
+
+# Table 6-4
+summary(train.lm.trend.season)
+
+# Figure 6-8
+par(mfrow = c(2,1))
+plot(train.lm.trend.season.pred, ylim = c(1300, 2625),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "", flty = 2)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.lm.trend.season.pred$fitted, lwd = 2, col = "blue")
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2600, "Training")
+text(2002.75, 2600, "Validation")
+text(2005.25, 2600, "Future")
+arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+plot(train.lm.trend.season.pred$residuals, ylim = c(-400, 550),  ylab = "Residuals", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.ts - train.lm.trend.season.pred$fitted)
+lines(valid.ts - train.lm.trend.season.pred$mean)
+lines(c(2004.25 - 3, 2004.25 - 3), c(-500, 3500))
+lines(c(2004.25, 2004.25), c(-500, 3500))
+text(1996.25, 525, "Training")
+text(2002.75, 525, "Validation")
+text(2005.25, 525, "Future")
+arrows(2004 - 3, 425, 1991.25, 425, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 425, 2004, 425, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 425, 2006, 425, code = 3, length = 0.1, lwd = 1, angle = 30)
+dev.off()
+
+```
+
+# Auto Correlations Plot and Treatment
+```{r Amtrak Fig 6-11, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+ridership.24.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, 24))
+
+# Figure 6-11
+Acf(ridership.24.ts, lag.max = 12, main = "")
+
+
+```
+
+
+```{r Amtrak Fig 6-12, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
+
+# Figure 6-12
+Acf(train.lm.trend.season$residuals, lag.max = 12, main = "")
+
+Acf(train.lm.trend.season$residuals, lag.max = 12, main = "")$acf
+# At lag-1 the acf is 0.60405883.
+```
+
+
+```{r Amtrak Fig 6-13 Fig 6-14, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)
+library(zoo)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
+train.res.arima <- Arima(train.lm.trend.season$residuals, order = c(1,0,0))
+train.res.arima.pred <- forecast(train.res.arima, h = nValid)
+
+# Figure 6-13
+plot(train.lm.trend.season$residuals, ylim = c(-250, 250),  ylab = "Residuals", 
+     xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(train.res.arima.pred$fitted, lwd = 2, col = "blue")
+lines(c(2004.25 - 3, 2004.25 - 3), c(-500, 3500))
+lines(c(2004.25, 2004.25), c(-500, 3500))
+text(1996.25, 225, "Training")
+text(2002.75, 225, "Validation")
+text(2005.25, 225, "Future")
+arrows(2004 - 3, 200, 1991.25, 200, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 200, 2004, 200, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 200, 2006, 200, code = 3, length = 0.1, lwd = 1, angle = 30)
+dev.off()
+
+summary(train.res.arima)
+
+# Figure 6-14
+Acf(train.res.arima$residuals, lag.max = 12, main = "")
+
+```
+
+```{r Amtrak Fig 7-7, echo=FALSE, warning=FALSE, message=FALSE}
+library(forecast)  
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+length(ridership.ts)
+nValid <- 36
+nTrain <- length(ridership.ts) - nValid
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+set.seed(201)
+ridership.nnetar <- nnetar(train.ts, repeats = 20, p = 11, P = 1, size = 7)
+summary(ridership.nnetar$model[[1]])
+ridership.nnetar.pred <- forecast(ridership.nnetar, h = nValid)
+accuracy(ridership.nnetar.pred, valid.ts)
+
+# Figure 7-7
+plot(train.ts, ylim = c(1300, 2900),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), lty = 1)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(ridership.nnetar.pred$fitted, lwd = 2, col = "blue")
+lines(ridership.nnetar.pred$mean, lwd = 2, col = "blue", lty = 2)
+lines(valid.ts)
+lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
+lines(c(2004.25, 2004.25), c(0, 3500))
+text(1996.25, 2850, "Training")
+text(2002.75, 2850, "Validation")
+text(2005.25, 2850, "Future")
+arrows(2004 - 3, 2700, 1991.25, 2700, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5 - 3, 2700, 2004, 2700, code = 3, length = 0.1, lwd = 1,angle = 30)
+arrows(2004.5, 2700, 2006, 2700, code = 3, length = 0.1, lwd = 1, angle = 30)
+
+ridership.nnetar.opt <- nnetar(train.ts)
+ridership.nnetar.opt
+ridership.nnetar.opt.pred <- forecast(ridership.nnetar.opt, h = nValid)
+accuracy(ridership.nnetar.opt.pred, valid.ts)
+
+```
+
+
+
+
+
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
+# * "Amtrak Fig 2-3.R"
+# * "Amtrak Fig 2-6.R"
+# * "Amtrak Fig 3-1.R"
+# * "Amtrak Fig 3-2.R"
+# * "Amtrak Fig 3-3.R"
+# * "Amtrak Fig 3-4.R"
+# * "Amtrak Fig 3-5.R"
+# * "Amtrak Fig 3-6.R"
+# * "Amtrak Fig 5-2.R"
+# * "Amtrak Fig 5-3.R"
+# * "Amtrak Fig 5-4.R"
+# * "Amtrak Fig 5-5, Tab 5-1.R"
+# * "Amtrak Fig 5-6, Tab 5-2, 5-4, 5-5.R"
+# * "Amtrak Fig 6-2, Tab 6-1.R"
+# * "Amtrak Fig 6-3, 6-5.R"
+# * "Amtrak Fig 6-11.R"
+# * "Amtrak Fig 6-12.R"
+# * "Amtrak Fig 6-13, Fig 6-14.R"
+# * "Amtrak Fig 7-7.R"
+# * "Amtrak Tab 6-2.R"
+# * "Amtrak Tab 6-3, Fig 6-7, Tab 6-5.R"
+# * "Amtrak Tab 6-4, Fig 6-8.R"
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
