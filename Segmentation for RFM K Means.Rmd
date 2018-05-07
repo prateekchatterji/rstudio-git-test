@@ -3,6 +3,8 @@ title: "Segementation for RFM using K Means_v1"
 output:
   html_document:
     df_print: paged
+    keep_md: true
+  pdf_document: default
 ---
 
 ---
@@ -63,9 +65,9 @@ download.file(githubURL,"rawdata")
 load("rawdata")
 
 # Prepare data
-str(raw.data)
+#str(raw.data)
 data <- raw.data # the data takes a couple of minutes to import, so I keep raw.data as a backup
-str(data)
+#str(data)
 ```
 
 ### Cleaning Data
@@ -476,4 +478,4 @@ remove(colors)
 
 PS: 3 Cluster Model
 
-![3 Cluster Model](https://github.com/prateekchatterji/rstudio-git-test/raw/master/3ClusterModelCapture.PNG)
+![3 Cluster Model](3ClusterModelCapture.PNG)
