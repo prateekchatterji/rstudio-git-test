@@ -457,7 +457,7 @@ colors <- c('red','orange','green3','deepskyblue','blue','darkorchid4','violet',
 
 library(car)
 library(rgl)
-dev.off()
+#dev.off()
 scatter3d(x = customers$frequency.log, 
           y = customers$monetary.log,
           z = customers$recency.log, 
