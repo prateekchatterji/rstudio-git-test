@@ -126,8 +126,9 @@
 \maketitle
 
 \textbf{Amtrak}, a US railway company, routinely collects data on
-ridership. This exercise is built on series of monthly Amtrak ridership
-between January 1991 and March 2004 in the United States.
+ridership. This is a subjective exercise built on series of monthly
+Amtrak ridership between January 1991 and March 2004 in the United
+States.
 
 Data is in public domain
 \href{https://docs.google.com/open?id=0B76mgCvz1US5Z1lGRkZQZ1pRLTQ}{here}.
@@ -182,11 +183,11 @@ Forecasting Process
 \subsubsection{Forecast Horizon}\label{forecast-horizon}
 
 Forecast Horizon is the \emph{k} number of periods ahead that we must
-forecast, and Ft+k is a \emph{k}-step-ahead forecast. In Amtrack
-ridership example, one month ahead forecast (Ft+1) mightbe sufficient
-for Revenue management for creating flexible pricing. Whereas longer
-term forecasts, such as three month ahead forecast (Ft+3) are more
-likely to be needed for scheduling and procurement purpose.
+forecast, and \(F_{t+k}\) is a \emph{k}-step-ahead forecast. In Amtrack
+ridership example, one month ahead forecast \(F_{t+1}\) mightbe
+sufficient for Revenue management for creating flexible pricing. Whereas
+longer term forecasts, such as three month ahead forecast \(F_{t+3}\)
+are more likely to be needed for scheduling and procurement purpose.
 
 \subsubsection{Forecast Updating}\label{forecast-updating}
 
@@ -207,7 +208,11 @@ adjusted in some way before use? Will the forecast be presented to
 management or to the Technical department? Answers to such questions are
 necessary to choose appropriate data, methods and evaluation schemes.
 
-Libraries used are:
+\subsubsection{Libraries}\label{libraries}
+
+We will use \href{https://robjhyndman.com/about/}{Rob J Hyndman's}
+\href{https://www.rdocumentation.org/packages/forecast/versions/8.3}{forecast}
+package
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -287,23 +292,84 @@ Libraries used are:
 ##     as.Date, as.Date.numeric
 \end{verbatim}
 
+Different kinds of Forecasting
+
+\subsubsection{Timeplot}\label{timeplot}
+
+A timeplot of monthly Amtrack ridership is shown in Figure 2.3.
+Observing the plot reveals nature of time series components.
+
+\begin{itemize}
+\item
+  Values Scale: Thousands ofriders
+\item
+  Overall Level: 1,800,000 riders/month
+\item
+  Trend: Slight U-shaped
+\item
+  Seasonality: Pronounced, Annual, Peaks: July, August
+\end{itemize}
+
 Figure 2.3: Monthly ridership on AMtrack Trains (in thousands) from Jan
 1991 to March 2004
 
-\includegraphics{FCAS_files/figure-latex/Amtrak Fig 2-3-1.pdf} Line plot
-of Ridership - The dataset
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 2-3-1.pdf}
 
-\section{Linear Fitting and
-Smoothening}\label{linear-fitting-and-smoothening}
+\subsubsection{Trend and Zooming/Window}\label{trend-and-zoomingwindow}
+
+To fit a quadratic trend, run the forecast package's linear regression
+model for time series, called tslm. The y value is ridership and two x
+values are trend and square of trend. The function I treats square of
+trend as-is. Plot time series and its fitted regression line in the top
+panel of figure 2.4 The bottom panel shows a zoomed-in view of
+timeseries from January 1997 to December 2000. Use the window function
+to identify a subset of time series.
 
 \includegraphics{FCAS_files/figure-latex/Amtrak Fig 2-6-1.pdf}
 
-\section{Partitioning}\label{partitioning}
+\subsubsection{Partitioning the Data}\label{partitioning-the-data}
+
+Temporal partitioning: Partitioning the data in Training and Validation
+period is a linear process unlike that used in Cross sectional data
+which must be randomly selected. A random selection on a timeline will
+cause a ``hole''. In the same vein, a third partition - ``test''- is not
+advised as the impact of recency on forecasting is much higher. The
+latest partition, if made, will affect the forecasting detrimentally.
+Finally, the last difference is that in Time series, Training and
+Validation dataset are recombined before attempting to forecast future
+values.
+
+Define the number of months of training and validation datasets,
+\texttt{nValid} and \texttt{nTrain}, respectively. Use the \texttt{time}
+and \texttt{window} function to create the training and validation sets.
+Fit a model (here, a linear regression model) to the training set. Use
+the \texttt{forecast} function to make predictions of time series in the
+validation period. Plot the predictions.
 
 \includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-1-1.pdf}
 
-\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-2-1.pdf} Computing
-Predictive Measures
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-2-1.pdf} \#\#\#
+Computing Predictive Measures
+
+\begin{itemize}
+\item
+  Forecast Error/ Residual
+\item
+  MAE/MAD
+\item
+  Average Error
+\item
+  MAPE
+\item
+  RMSE
+\item
+  Zero Counts affecting MAPE
+\item
+  MASE
+\item
+  Forecast accuracy vs Profitability: Balancing the cost and perspective
+  of Type One and Type Two Errors
+\end{itemize}
 
 \begin{verbatim}
 ##                 ME     RMSE      MAE       MPE    MAPE      ACF1 Theil's U
@@ -312,7 +378,19 @@ Predictive Measures
 
 \subsubsection{Residuals}\label{residuals}
 
-\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-3-1.pdf}
+Use the \texttt{names} function to fund out which elements are included
+with the \texttt{forecast} object called \texttt{ridership.lm.pred}. The
+model's residuals are forecast error in training period. Subtracting the
+model's \texttt{mean} (or forecasts) from \texttt{valid.ts} (or actuals)
+in the validation period gives the forecast error in the validation
+period. \includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-3-1.pdf}
+
+Figure 3.3: Timeplot of forecast errors (residuals) from a quadratic
+trend model applied to the Amtrack ridership data.
+
+Put the model's residuals into the \texttt{hist} function to plot the
+histogram of, or frequency of forecast errors in each of seven
+(automatically and equally sized) bins.
 
 \begin{verbatim}
 ##  [1] "model"     "mean"      "lower"     "upper"     "level"    
@@ -322,9 +400,27 @@ Predictive Measures
 
 \includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-4-1.pdf}
 
+Figure 3.4: Histogram of forecast errors in the Training period from a
+quadratic trend model applied to the Amtrack ridership data.
+
+Prediction Intervals: When errors are not normally distributed, forecast
+errors can be obtained from the training period to construct a
+prediction interval in the validation period and future. For example, a
+95\% prediction interval can be constructed by using the 5th and 95th
+percentiles from the sample of forecast errors.
+
 \includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-5-1.pdf}
 
+Figure 3.5: Point forecasts and 95\% prediction intervals in the
+validation period gained from a quadratic trend model applied to the
+Amtrack ridership data. (\texttt{level\ =\ 95})
+
 \includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-6-1.pdf}
+
+Figure 3.7: Naïve forecasts using a fixed validation period (Dashed
+horizontal line in blue) vs one-step-ahead Naïve forecasts using monthly
+roll-forward validation period (other dashed line in green) for Amtrack
+ridership data. The actual values are plotted with a smooth line.
 
 \begin{verbatim}
 ## [1] 119.4289
@@ -357,35 +453,8 @@ Predictive Measures
 \end{verbatim}
 
 \begin{verbatim}
-## List of 10
-##  $ method   : chr "Naive method"
-##  $ model    :List of 5
-##   ..$ includedrift: logi FALSE
-##   ..$ drift       : num 0
-##   ..$ drift.se    : num 0
-##   ..$ sd          : num 168
-##   ..$ call        : language naive(y = train.ts, h = fixed.nValid)
-##   ..- attr(*, "class")= chr "naive"
-##  $ level    : num [1:2] 80 95
-##  $ mean     : Time-Series [1:36] from 2001 to 2004: 2008 2008 2008 2008 2008 ...
-##  $ lower    : Time-Series [1:36, 1:2] from 2001 to 2004: 1792 1703 1635 1577 1526 ...
-##   ..- attr(*, "dimnames")=List of 2
-##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "80%" "95%"
-##  $ upper    : Time-Series [1:36, 1:2] from 2001 to 2004: 2223 2313 2381 2439 2490 ...
-##   ..- attr(*, "dimnames")=List of 2
-##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "80%" "95%"
-##  $ x        : Time-Series [1:123] from 1991 to 2001: 1709 1621 1973 1812 1975 ...
-##  $ series   : chr "train.ts"
-##  $ fitted   : Time-Series [1:123] from 1991 to 2001: NA 1709 1621 1973 1812 ...
-##  $ residuals: Time-Series [1:123] from 1991 to 2001: NA -88.3 352.1 -161 163.3 ...
-##  - attr(*, "class")= chr "forecast"
-\end{verbatim}
-
-\begin{verbatim}
 ## % latex table generated in R 3.5.0 by xtable 1.8-2 package
-## % Thu May 31 13:39:10 2018
+## % Thu May 31 18:05:53 2018
 ## \begin{table}[ht]
 ## \centering
 ## \begin{tabular}{rrrr}
@@ -443,73 +512,6 @@ Predictive Measures
 ## Sep 2001 1707.693 2007.928       1823.706
 \end{verbatim}
 
-\begin{longtable}[]{@{}rrr@{}}
-\toprule
-Actual & Naive & Seasonal Naive\tabularnewline
-\midrule
-\endhead
-2023.792 & 2007.928 & 1971.493\tabularnewline
-2047.008 & 2007.928 & 1992.301\tabularnewline
-2072.913 & 2007.928 & 2009.763\tabularnewline
-2126.717 & 2007.928 & 2053.996\tabularnewline
-2202.638 & 2007.928 & 2097.471\tabularnewline
-1707.693 & 2007.928 & 1823.706\tabularnewline
-1950.716 & 2007.928 & 1976.997\tabularnewline
-1973.614 & 2007.928 & 1981.408\tabularnewline
-1984.729 & 2007.928 & 2000.153\tabularnewline
-1759.629 & 2007.928 & 1683.148\tabularnewline
-1770.595 & 2007.928 & 1663.404\tabularnewline
-2019.912 & 2007.928 & 2007.928\tabularnewline
-2048.398 & 2007.928 & 1971.493\tabularnewline
-2068.763 & 2007.928 & 1992.301\tabularnewline
-1994.267 & 2007.928 & 2009.763\tabularnewline
-2075.258 & 2007.928 & 2053.996\tabularnewline
-2026.560 & 2007.928 & 2097.471\tabularnewline
-1734.155 & 2007.928 & 1823.706\tabularnewline
-1916.771 & 2007.928 & 1976.997\tabularnewline
-1858.345 & 2007.928 & 1981.408\tabularnewline
-1996.352 & 2007.928 & 2000.153\tabularnewline
-1778.033 & 2007.928 & 1683.148\tabularnewline
-1749.489 & 2007.928 & 1663.404\tabularnewline
-2066.466 & 2007.928 & 2007.928\tabularnewline
-2098.899 & 2007.928 & 1971.493\tabularnewline
-2104.911 & 2007.928 & 1992.301\tabularnewline
-2129.671 & 2007.928 & 2009.763\tabularnewline
-2223.349 & 2007.928 & 2053.996\tabularnewline
-2174.360 & 2007.928 & 2097.471\tabularnewline
-1931.406 & 2007.928 & 1823.706\tabularnewline
-2121.470 & 2007.928 & 1976.997\tabularnewline
-2076.054 & 2007.928 & 1981.408\tabularnewline
-2140.677 & 2007.928 & 2000.153\tabularnewline
-1831.508 & 2007.928 & 1683.148\tabularnewline
-1838.006 & 2007.928 & 1663.404\tabularnewline
-2132.446 & 2007.928 & 2007.928\tabularnewline
-\bottomrule
-\end{longtable}
-
-\begin{verbatim}
-## Apr 2001 May 2001 Jun 2001 Jul 2001 Aug 2001 Sep 2001 Oct 2001 Nov 2001 
-## 2023.792 2047.008 2072.913 2126.717 2202.638 1707.693 1950.716 1973.614 
-## Dec 2001 Jan 2002 Feb 2002 Mar 2002 Apr 2002 May 2002 Jun 2002 Jul 2002 
-## 1984.729 1759.629 1770.595 2019.912 2048.398 2068.763 1994.267 2075.258 
-## Aug 2002 Sep 2002 Oct 2002 Nov 2002 Dec 2002 Jan 2003 Feb 2003 Mar 2003 
-## 2026.560 1734.155 1916.771 1858.345 1996.352 1778.033 1749.489 2066.466 
-## Apr 2003 May 2003 Jun 2003 Jul 2003 Aug 2003 Sep 2003 Oct 2003 Nov 2003 
-## 2098.899 2104.911 2129.671 2223.349 2174.360 1931.406 2121.470 2076.054 
-## Dec 2003 Jan 2004 Feb 2004 Mar 2004 
-## 2140.677 1831.508 1838.006 2132.446
-\end{verbatim}
-
-\begin{verbatim}
-##            Actual    Naive Seasonal Naive
-## Apr 2001 2023.792 2007.928       1971.493
-## May 2001 2047.008 2007.928       1992.301
-## Jun 2001 2072.913 2007.928       2009.763
-## Jul 2001 2126.717 2007.928       2053.996
-## Aug 2001 2202.638 2007.928       2097.471
-## Sep 2001 1707.693 2007.928       1823.706
-\end{verbatim}
-
 \begin{longtable}[]{@{}lrrrrr@{}}
 \caption{Comparison of Accuracy Metrics}\tabularnewline
 \toprule
@@ -524,8 +526,14 @@ Naive & 142.75509 & 115.92339 & -1.274999 & 6.021396 &
 1.405269\tabularnewline
 Seasonal Naive & 95.62433 & 84.09406 & 2.652793 & 4.247656 &
 1.019421\tabularnewline
+Table 3.4: Naïve & and season n & aïve forecas & ts for fixed &
+validation & period\tabularnewline
+(ridership data) & & & & &\tabularnewline
 \bottomrule
 \end{longtable}
+
+Table 3.5: Performance of naïve vs seasonal naïve forecasts using fixed
+partitioning
 
 \section{Smoothening}\label{smoothening}
 

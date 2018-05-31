@@ -1,12 +1,12 @@
 ---
 title: "Amtrack Ridership Forecasting"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 **Amtrak**, a US railway company, routinely collects data on ridership. This is a subjective exercise
-exercise is built on series of monthly Amtrak ridership between January 1991 and
+built on series of monthly Amtrak ridership between January 1991 and
 March 2004 in the United States.
 
 Data is in public domain
