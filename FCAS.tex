@@ -1,0 +1,1909 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Amtrack Ridership Forecasting},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{Amtrack Ridership Forecasting}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{}
+  \preauthor{}\postauthor{}
+  \date{}
+  \predate{}\postdate{}
+
+
+\begin{document}
+\maketitle
+
+\textbf{Amtrak}, a US railway company, routinely collects data on
+ridership. This exercise is built on series of monthly Amtrak ridership
+between January 1991 and March 2004 in the United States.
+
+Data is in public domain
+\href{https://docs.google.com/open?id=0B76mgCvz1US5Z1lGRkZQZ1pRLTQ}{here}.
+
+\subsection{Process}\label{process}
+
+The Forecasting Process that we undertake is noted as follows:
+
+\begin{figure}
+\centering
+\includegraphics{C:/Users/Administrator/Downloads/ForecastingProcess.png}
+\caption{Forecasting Process}
+\end{figure}
+
+Forecasting Process
+
+\subsection{Goals}\label{goals}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Forecast monthly user ridership on its trains for the purpose of
+  Pricing. Using demand data to determine Pricing is called ``revenue
+  management'' and is a popular practice by airlines and hotel chains.
+  It is a Predictive Goal.
+\item
+  Impact Assessment: Evaluating the effect of an event on the timeline
+  such as Airport closure due to inclement weather, or the opening on
+  new large national highway. This goal is retrospective in nature, and
+  is therefore descriptive or even explanatory. Analysis would compare
+  the series before and after the event, with no direct interest in
+  future values of the series. Note that these goals are also geography
+  specific and would therefore require using ridership data at a finer
+  level of geography within United States.
+\item
+  Identifying and quantifying Demand during different seasons for
+  planning the number and frequency of trains needed during different
+  seasons. If the model is only aimed at producing monthly indexes of
+  demand, then it is a descriptive goal. In contrast, if the model will
+  be used to forecast seasonal demand for future years then it is a
+  predictive task.
+\item
+  Finally, the Amtrack ridership data may be used by national agencies,
+  such as Bureau of Transport Statistics to evaluate trends in
+  transportation modes over the years. Whether it is descriptive or
+  predictive goal depends on what the analysis will be used for. If it
+  is used for the purpose of reporting past trends, then it is
+  descriptive. If the purpose is forecasting future trends, then it is
+  predictive goal.
+\end{enumerate}
+
+\subsubsection{Forecast Horizon}\label{forecast-horizon}
+
+Forecast Horizon is the \emph{k} number of periods ahead that we must
+forecast, and Ft+k is a \emph{k}-step-ahead forecast. In Amtrack
+ridership example, one month ahead forecast (Ft+1) mightbe sufficient
+for Revenue management for creating flexible pricing. Whereas longer
+term forecasts, such as three month ahead forecast (Ft+3) are more
+likely to be needed for scheduling and procurement purpose.
+
+\subsubsection{Forecast Updating}\label{forecast-updating}
+
+Timeliness of data collection and transfer directly affect the forecast
+horizon. Whether improving the timeliness of data collection and
+transfer is possible or not, its implications on forecasting must be
+recognized at goal definition stage. Refreshing of forecasts based on
+new data is called \emph{roll-forward forecasting}.
+
+\subsubsection{Forecast Use}\label{forecast-use}
+
+Understanding how the forecast will be used, perhaps by different
+stakeholders, is critical for generating forecasts of the right type and
+with a useful accuracy level. Should the forecasts be
+binary(event/non-event)? Does over-production cost more or less than
+under-production? Will the forecast be used directly or will they be
+adjusted in some way before use? Will the forecast be presented to
+management or to the Technical department? Answers to such questions are
+necessary to choose appropriate data, methods and evaluation schemes.
+
+Libraries used are:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(tidyverse) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: tidyverse
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching packages --------------
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 2.2.1     v purrr   0.2.4
+## v tibble  1.4.2     v dplyr   0.7.4
+## v tidyr   0.8.0     v stringr 1.3.1
+## v readr   1.1.1     v forcats 0.3.0
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts -----------------------
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(forecast)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: forecast
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(xtable)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: xtable
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(knitr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: knitr
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(zoo)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: zoo
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'zoo'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+\end{verbatim}
+
+Figure 2.3: Monthly ridership on AMtrack Trains (in thousands) from Jan
+1991 to March 2004
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 2-3-1.pdf} Line plot
+of Ridership - The dataset
+
+\section{Linear Fitting and
+Smoothening}\label{linear-fitting-and-smoothening}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 2-6-1.pdf}
+
+\section{Partitioning}\label{partitioning}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-1-1.pdf}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-2-1.pdf} Computing
+Predictive Measures
+
+\begin{verbatim}
+##                 ME     RMSE      MAE       MPE    MAPE      ACF1 Theil's U
+## Test set -83.96208 179.8494 133.7383 -4.725374 7.07573 0.4170651  1.062068
+\end{verbatim}
+
+\subsubsection{Residuals}\label{residuals}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-3-1.pdf}
+
+\begin{verbatim}
+##  [1] "model"     "mean"      "lower"     "upper"     "level"    
+##  [6] "x"         "series"    "method"    "newdata"   "residuals"
+## [11] "fitted"
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-4-1.pdf}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-5-1.pdf}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 3-6-1.pdf}
+
+\begin{verbatim}
+## [1] 119.4289
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 169.1733
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0.06206066
+\end{verbatim}
+
+\begin{verbatim}
+##                     ME     RMSE      MAE        MPE     MAPE     MASE
+## Training set   2.45091 168.1470 125.2975 -0.3460027 7.271393 1.518906
+## Test set     -14.71772 142.7551 115.9234 -1.2749992 6.021396 1.405269
+##                    ACF1 Theil's U
+## Training set -0.2472621        NA
+## Test set      0.2764480 0.8346967
+\end{verbatim}
+
+\begin{verbatim}
+##                    ME     RMSE      MAE       MPE     MAPE     MASE
+## Training set 13.93991 99.26557 82.49196 0.5850656 4.715251 1.000000
+## Test set     54.72961 95.62433 84.09406 2.6527928 4.247656 1.019421
+##                   ACF1 Theil's U
+## Training set 0.6400044        NA
+## Test set     0.6373346 0.5532435
+\end{verbatim}
+
+\begin{verbatim}
+## List of 10
+##  $ method   : chr "Naive method"
+##  $ model    :List of 5
+##   ..$ includedrift: logi FALSE
+##   ..$ drift       : num 0
+##   ..$ drift.se    : num 0
+##   ..$ sd          : num 168
+##   ..$ call        : language naive(y = train.ts, h = fixed.nValid)
+##   ..- attr(*, "class")= chr "naive"
+##  $ level    : num [1:2] 80 95
+##  $ mean     : Time-Series [1:36] from 2001 to 2004: 2008 2008 2008 2008 2008 ...
+##  $ lower    : Time-Series [1:36, 1:2] from 2001 to 2004: 1792 1703 1635 1577 1526 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:2] "80%" "95%"
+##  $ upper    : Time-Series [1:36, 1:2] from 2001 to 2004: 2223 2313 2381 2439 2490 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:2] "80%" "95%"
+##  $ x        : Time-Series [1:123] from 1991 to 2001: 1709 1621 1973 1812 1975 ...
+##  $ series   : chr "train.ts"
+##  $ fitted   : Time-Series [1:123] from 1991 to 2001: NA 1709 1621 1973 1812 ...
+##  $ residuals: Time-Series [1:123] from 1991 to 2001: NA -88.3 352.1 -161 163.3 ...
+##  - attr(*, "class")= chr "forecast"
+\end{verbatim}
+
+\begin{verbatim}
+## % latex table generated in R 3.5.0 by xtable 1.8-2 package
+## % Thu May 31 13:39:10 2018
+## \begin{table}[ht]
+## \centering
+## \begin{tabular}{rrrr}
+##   \hline
+##  & Actual & Naive & Seasonal.Naive \\ 
+##   \hline
+## 2001 Apr & 2023.79 & 2007.93 & 1971.49 \\ 
+##   2001 May & 2047.01 & 2007.93 & 1992.30 \\ 
+##   2001 Jun & 2072.91 & 2007.93 & 2009.76 \\ 
+##   2001 Jul & 2126.72 & 2007.93 & 2054.00 \\ 
+##   2001 Aug & 2202.64 & 2007.93 & 2097.47 \\ 
+##   2001 Sep & 1707.69 & 2007.93 & 1823.71 \\ 
+##   2001 Oct & 1950.72 & 2007.93 & 1977.00 \\ 
+##   2001 Nov & 1973.61 & 2007.93 & 1981.41 \\ 
+##   2001 Dec & 1984.73 & 2007.93 & 2000.15 \\ 
+##   2002 Jan & 1759.63 & 2007.93 & 1683.15 \\ 
+##   2002 Feb & 1770.60 & 2007.93 & 1663.40 \\ 
+##   2002 Mar & 2019.91 & 2007.93 & 2007.93 \\ 
+##   2002 Apr & 2048.40 & 2007.93 & 1971.49 \\ 
+##   2002 May & 2068.76 & 2007.93 & 1992.30 \\ 
+##   2002 Jun & 1994.27 & 2007.93 & 2009.76 \\ 
+##   2002 Jul & 2075.26 & 2007.93 & 2054.00 \\ 
+##   2002 Aug & 2026.56 & 2007.93 & 2097.47 \\ 
+##   2002 Sep & 1734.15 & 2007.93 & 1823.71 \\ 
+##   2002 Oct & 1916.77 & 2007.93 & 1977.00 \\ 
+##   2002 Nov & 1858.35 & 2007.93 & 1981.41 \\ 
+##   2002 Dec & 1996.35 & 2007.93 & 2000.15 \\ 
+##   2003 Jan & 1778.03 & 2007.93 & 1683.15 \\ 
+##   2003 Feb & 1749.49 & 2007.93 & 1663.40 \\ 
+##   2003 Mar & 2066.47 & 2007.93 & 2007.93 \\ 
+##   2003 Apr & 2098.90 & 2007.93 & 1971.49 \\ 
+##   2003 May & 2104.91 & 2007.93 & 1992.30 \\ 
+##   2003 Jun & 2129.67 & 2007.93 & 2009.76 \\ 
+##   2003 Jul & 2223.35 & 2007.93 & 2054.00 \\ 
+##   2003 Aug & 2174.36 & 2007.93 & 2097.47 \\ 
+##   2003 Sep & 1931.41 & 2007.93 & 1823.71 \\ 
+##   2003 Oct & 2121.47 & 2007.93 & 1977.00 \\ 
+##   2003 Nov & 2076.05 & 2007.93 & 1981.41 \\ 
+##   2003 Dec & 2140.68 & 2007.93 & 2000.15 \\ 
+##   2004 Jan & 1831.51 & 2007.93 & 1683.15 \\ 
+##   2004 Feb & 1838.01 & 2007.93 & 1663.40 \\ 
+##   2004 Mar & 2132.45 & 2007.93 & 2007.93 \\ 
+##    \hline
+## \end{tabular}
+## \end{table}
+\end{verbatim}
+
+\begin{verbatim}
+##            Actual    Naive Seasonal Naive
+## Apr 2001 2023.792 2007.928       1971.493
+## May 2001 2047.008 2007.928       1992.301
+## Jun 2001 2072.913 2007.928       2009.763
+## Jul 2001 2126.717 2007.928       2053.996
+## Aug 2001 2202.638 2007.928       2097.471
+## Sep 2001 1707.693 2007.928       1823.706
+\end{verbatim}
+
+\begin{longtable}[]{@{}rrr@{}}
+\toprule
+Actual & Naive & Seasonal Naive\tabularnewline
+\midrule
+\endhead
+2023.792 & 2007.928 & 1971.493\tabularnewline
+2047.008 & 2007.928 & 1992.301\tabularnewline
+2072.913 & 2007.928 & 2009.763\tabularnewline
+2126.717 & 2007.928 & 2053.996\tabularnewline
+2202.638 & 2007.928 & 2097.471\tabularnewline
+1707.693 & 2007.928 & 1823.706\tabularnewline
+1950.716 & 2007.928 & 1976.997\tabularnewline
+1973.614 & 2007.928 & 1981.408\tabularnewline
+1984.729 & 2007.928 & 2000.153\tabularnewline
+1759.629 & 2007.928 & 1683.148\tabularnewline
+1770.595 & 2007.928 & 1663.404\tabularnewline
+2019.912 & 2007.928 & 2007.928\tabularnewline
+2048.398 & 2007.928 & 1971.493\tabularnewline
+2068.763 & 2007.928 & 1992.301\tabularnewline
+1994.267 & 2007.928 & 2009.763\tabularnewline
+2075.258 & 2007.928 & 2053.996\tabularnewline
+2026.560 & 2007.928 & 2097.471\tabularnewline
+1734.155 & 2007.928 & 1823.706\tabularnewline
+1916.771 & 2007.928 & 1976.997\tabularnewline
+1858.345 & 2007.928 & 1981.408\tabularnewline
+1996.352 & 2007.928 & 2000.153\tabularnewline
+1778.033 & 2007.928 & 1683.148\tabularnewline
+1749.489 & 2007.928 & 1663.404\tabularnewline
+2066.466 & 2007.928 & 2007.928\tabularnewline
+2098.899 & 2007.928 & 1971.493\tabularnewline
+2104.911 & 2007.928 & 1992.301\tabularnewline
+2129.671 & 2007.928 & 2009.763\tabularnewline
+2223.349 & 2007.928 & 2053.996\tabularnewline
+2174.360 & 2007.928 & 2097.471\tabularnewline
+1931.406 & 2007.928 & 1823.706\tabularnewline
+2121.470 & 2007.928 & 1976.997\tabularnewline
+2076.054 & 2007.928 & 1981.408\tabularnewline
+2140.677 & 2007.928 & 2000.153\tabularnewline
+1831.508 & 2007.928 & 1683.148\tabularnewline
+1838.006 & 2007.928 & 1663.404\tabularnewline
+2132.446 & 2007.928 & 2007.928\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+## Apr 2001 May 2001 Jun 2001 Jul 2001 Aug 2001 Sep 2001 Oct 2001 Nov 2001 
+## 2023.792 2047.008 2072.913 2126.717 2202.638 1707.693 1950.716 1973.614 
+## Dec 2001 Jan 2002 Feb 2002 Mar 2002 Apr 2002 May 2002 Jun 2002 Jul 2002 
+## 1984.729 1759.629 1770.595 2019.912 2048.398 2068.763 1994.267 2075.258 
+## Aug 2002 Sep 2002 Oct 2002 Nov 2002 Dec 2002 Jan 2003 Feb 2003 Mar 2003 
+## 2026.560 1734.155 1916.771 1858.345 1996.352 1778.033 1749.489 2066.466 
+## Apr 2003 May 2003 Jun 2003 Jul 2003 Aug 2003 Sep 2003 Oct 2003 Nov 2003 
+## 2098.899 2104.911 2129.671 2223.349 2174.360 1931.406 2121.470 2076.054 
+## Dec 2003 Jan 2004 Feb 2004 Mar 2004 
+## 2140.677 1831.508 1838.006 2132.446
+\end{verbatim}
+
+\begin{verbatim}
+##            Actual    Naive Seasonal Naive
+## Apr 2001 2023.792 2007.928       1971.493
+## May 2001 2047.008 2007.928       1992.301
+## Jun 2001 2072.913 2007.928       2009.763
+## Jul 2001 2126.717 2007.928       2053.996
+## Aug 2001 2202.638 2007.928       2097.471
+## Sep 2001 1707.693 2007.928       1823.706
+\end{verbatim}
+
+\begin{longtable}[]{@{}lrrrrr@{}}
+\caption{Comparison of Accuracy Metrics}\tabularnewline
+\toprule
+& RMSE & MAE & MPE & MAPE & MASE\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+& RMSE & MAE & MPE & MAPE & MASE\tabularnewline
+\midrule
+\endhead
+Naive & 142.75509 & 115.92339 & -1.274999 & 6.021396 &
+1.405269\tabularnewline
+Seasonal Naive & 95.62433 & 84.09406 & 2.652793 & 4.247656 &
+1.019421\tabularnewline
+\bottomrule
+\end{longtable}
+
+\section{Smoothening}\label{smoothening}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-2-1.pdf}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-3-1.pdf}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-4-1.pdf}
+
+\begin{verbatim}
+## null device 
+##           1
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = ridership.deseasonalized ~ trend)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -241.873  -56.022   -0.219   59.150  284.792 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -40.3641    15.0455  -2.683  0.00815 ** 
+## trend         0.8294     0.1764   4.702 5.93e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 90.74 on 145 degrees of freedom
+## Multiple R-squared:  0.1323, Adjusted R-squared:  0.1263 
+## F-statistic: 22.11 on 1 and 145 DF,  p-value: 5.935e-06
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-5 Tab 5-1-1.pdf}
+
+\begin{verbatim}
+## null device 
+##           1
+\end{verbatim}
+
+\begin{verbatim}
+## ETS(A,N,N) 
+## 
+## Call:
+##  ets(y = train.ts, model = "ANN") 
+## 
+##   Smoothing parameters:
+##     alpha = 1e-04 
+## 
+##   Initial states:
+##     l = 1.4679 
+## 
+##   sigma:  83.5845
+## 
+##      AIC     AICc      BIC 
+## 1494.723 1494.950 1502.825
+\end{verbatim}
+
+\begin{verbatim}
+##                      ME     RMSE      MAE       MPE     MAPE      MASE
+## Training set -0.9407425 90.82254 68.01782 181.35457 225.2854 0.6669040
+## Test set      5.7226043 75.99033 54.88964  55.92139 178.3106 0.5381843
+##                    ACF1 Theil's U
+## Training set -0.3678952        NA
+## Test set     -0.3665235     1.113
+\end{verbatim}
+
+\begin{verbatim}
+##                      ME     RMSE      MAE      MPE     MAPE      MASE
+## Training set  0.1883115 82.82115 62.90072 100.5062 105.4250 0.6167316
+## Test set     -2.0924502 75.80343 53.05667 110.2116 110.2116 0.5202123
+##                    ACF1 Theil's U
+## Training set -0.3398587        NA
+## Test set     -0.3665235 0.9662741
+\end{verbatim}
+
+\begin{verbatim}
+## Series: train.ts 
+## ARIMA(1,0,1)(0,0,1)[12] with non-zero mean 
+## 
+## Coefficients:
+##          ar1      ma1     sma1    mean
+##       0.3850  -0.8181  -0.7545  1.3775
+## s.e.  0.1529   0.1032   0.1100  0.7093
+## 
+## sigma^2 estimated as 3894:  log likelihood=-614.1
+## AIC=1238.2   AICc=1238.78   BIC=1251.7
+\end{verbatim}
+
+\begin{verbatim}
+## ETS(M,N,A) 
+## 
+## Call:
+##  ets(y = rts) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.5157 
+##     gamma = 8e-04 
+## 
+##   Initial states:
+##     l = 1813.5087 
+##     s=28.527 -16.1115 -3.9429 -121.4959 203.2382 154.7662
+##            30.7515 74.6798 50.5657 44.6936 -250.4517 -195.2199
+## 
+##   sigma:  0.0352
+## 
+##      AIC     AICc      BIC 
+## 1437.993 1443.100 1478.500
+\end{verbatim}
+
+\begin{verbatim}
+##  [1]  56.89533  72.41222  47.58071 109.40784 105.01269  70.84465  64.63404
+##  [8]  65.44567  80.81070 134.14835 132.05848 103.71279 106.18907 107.98966
+## [15] 109.53008 110.97033 112.37201 113.75885 115.13997 116.51889 117.89696
+## [22] 119.27470 120.65232 122.02989 123.40744 124.78498 126.16252 127.54006
+## [29] 128.91760 130.29514 131.67268 133.05022 134.42776 135.80530 137.18284
+## [36] 138.56038
+\end{verbatim}
+
+\begin{verbatim}
+##  [1] 1971.493 1992.301 2009.763 2053.996 2097.471 1823.706 1976.997
+##  [8] 1981.408 2000.153 1683.148 1663.404 2007.928 2028.388 2064.713
+## [15] 2057.344 2163.404 2202.484 1894.551 2041.631 2046.854 2080.964
+## [22] 1817.296 1795.462 2111.641 2134.577 2172.703 2166.874 2274.374
+## [29] 2314.856 2008.310 2156.771 2163.373 2198.861 1936.571 1916.115
+## [36] 2233.671 2257.985 2297.488 2293.036 2401.914 2443.773 2138.605
+## [43] 2288.444 2296.423 2333.288 2072.376 2053.298 2372.231
+\end{verbatim}
+
+\begin{verbatim}
+##  [1] 2028.388 2064.713 2057.344 2163.404 2202.484 1894.551 2041.631
+##  [8] 2046.854 2080.964 1817.296 1795.462 2111.641 2134.577 2172.703
+## [15] 2166.874 2274.374 2314.856 2008.310 2156.771 2163.373 2198.861
+## [22] 1936.571 1916.115 2233.671 2257.985 2297.488 2293.036 2401.914
+## [29] 2443.773 2138.605 2288.444 2296.423 2333.288 2072.376 2053.298
+## [36] 2372.231
+\end{verbatim}
+
+\begin{verbatim}
+##                 ME     RMSE     MAE       MPE    MAPE
+## Test set -152.0855 174.9945 152.959 -7.714254 7.75637
+\end{verbatim}
+
+\begin{verbatim}
+##                 l           s1           s2           s3           s4
+## Dec 1990 1810.451   28.8704914  -14.0943852   -0.4390261 -140.3217427
+## Jan 1991 1870.704 -209.9105160   28.8704914  -14.0943852   -0.4390261
+## Feb 1991 1870.640 -250.0023333 -209.9105160   28.8704914  -14.0943852
+## Mar 1991 1901.262   46.9955194 -250.0023333 -209.9105160   28.8704914
+## Apr 1991 1818.246   59.7228761   46.9955194 -250.0023333 -209.9105160
+## May 1991 1856.980   87.0470861   59.7228761   46.9955194 -250.0023333
+## Jun 1991 1831.789   50.6871461   87.0470861   59.7228761   46.9955194
+## Jul 1991 1806.836  152.9542746   50.6871461   87.0470861   59.7228761
+## Aug 1991 1816.807  188.4935596  152.9542746   50.6871461   87.0470861
+## Sep 1991 1771.881 -140.3425970  188.4935596  152.9542746   50.6871461
+## Oct 1991 1746.026   -0.4510282 -140.3425970  188.4935596  152.9542746
+## Nov 1991 1714.753  -14.1089019   -0.4510282 -140.3425970  188.4935596
+## Dec 1991 1753.793   28.8886138  -14.1089019   -0.4510282 -140.3425970
+## Jan 1992 1793.225 -209.8922117   28.8886138  -14.1089019   -0.4510282
+## Feb 1992 1800.932 -249.9987560 -209.8922117   28.8886138  -14.1089019
+## Mar 1992 1824.996   47.0066901 -249.9987560 -209.8922117   28.8886138
+## Apr 1992 1864.605   59.7412624   47.0066901 -249.9987560 -209.8922117
+## May 1992 1827.400   87.0298155   59.7412624   47.0066901 -249.9987560
+## Jun 1992 1685.641   50.6213421   87.0298155   59.7412624   47.0066901
+## Jul 1992 1721.610  152.9709713   50.6213421   87.0298155   59.7412624
+## Aug 1992 1769.749  188.5159054  152.9709713   50.6213421   87.0298155
+## Sep 1992 1811.152 -140.3233776  188.5159054  152.9709713   50.6213421
+## Oct 1992 1810.762   -0.4512091 -140.3233776  188.5159054  152.9709713
+## Nov 1992 1846.861  -14.0921448   -0.4512091 -140.3233776  188.5159054
+## Dec 1992 1846.512   28.8884518  -14.0921448   -0.4512091 -140.3233776
+## Jan 1993 1884.663 -209.8745022   28.8884518  -14.0921448   -0.4512091
+## Feb 1993 1875.698 -250.0029175 -209.8745022   28.8884518  -14.0921448
+## Mar 1993 1827.900   46.9845024 -250.0029175 -209.8745022   28.8884518
+## Apr 1993 1866.475   59.7591687   46.9845024 -250.0029175 -209.8745022
+## May 1993 1846.288   87.0204447   59.7591687   46.9845024 -250.0029175
+## Jun 1993 1838.222   50.6175981   87.0204447   59.7591687   46.9845024
+## Jul 1993 1805.882  152.9559592   50.6175981   87.0204447   59.7591687
+## Aug 1993 1806.865  188.5163617  152.9559592   50.6175981   87.0204447
+## Sep 1993 1810.367 -140.3217525  188.5163617  152.9559592   50.6175981
+## Oct 1993 1778.636   -0.4659384 -140.3217525  188.5163617  152.9559592
+## Nov 1993 1754.087  -14.1035402   -0.4659384 -140.3217525  188.5163617
+## Dec 1993 1727.028   28.8758910  -14.1035402   -0.4659384 -140.3217525
+## Jan 1994 1752.713 -209.8625792   28.8758910  -14.1035402   -0.4659384
+## Feb 1994 1792.314 -249.9845346 -209.8625792   28.8758910  -14.1035402
+## Mar 1994 1827.520   47.0008447 -249.9845346 -209.8625792   28.8758910
+## Apr 1994 1797.844   59.7453932   47.0008447 -249.9845346 -209.8625792
+## May 1994 1767.933   87.0065597   59.7453932   47.0008447 -249.9845346
+## Jun 1994 1744.146   50.6065565   87.0065597   59.7453932   47.0008447
+## Jul 1994 1727.697  152.9483236   50.6065565   87.0065597   59.7453932
+## Aug 1994 1722.358  188.5138834  152.9483236   50.6065565   87.0065597
+## Sep 1994 1779.938 -140.2950238  188.5138834  152.9483236   50.6065565
+## Oct 1994 1779.423   -0.4661775 -140.2950238  188.5138834  152.9483236
+## Nov 1994 1785.357  -14.1007860   -0.4661775 -140.2950238  188.5138834
+## Dec 1994 1768.192   28.8679229  -14.1007860   -0.4661775 -140.2950238
+## Jan 1995 1762.681 -209.8651371   28.8679229  -14.1007860   -0.4661775
+## Feb 1995 1753.915 -249.9886039 -209.8651371   28.8679229  -14.1007860
+## Mar 1995 1752.470   47.0001739 -249.9886039 -209.8651371   28.8679229
+## Apr 1995 1708.382   59.7249278   47.0001739 -249.9886039 -209.8651371
+## May 1995 1695.574   87.0006142   59.7249278   47.0001739 -249.9886039
+## Jun 1995 1703.926   50.6104335   87.0006142   59.7249278   47.0001739
+## Jul 1995 1667.676  152.9314964   50.6104335   87.0006142   59.7249278
+## Aug 1995 1678.031  188.5186901  152.9314964   50.6104335   87.0006142
+## Sep 1995 1696.691 -140.2863617  188.5186901  152.9314964   50.6104335
+## Oct 1995 1669.302   -0.4788915 -140.2863617  188.5186901  152.9314964
+## Nov 1995 1678.990  -14.0962890   -0.4788915 -140.2863617  188.5186901
+## Dec 1995 1650.636   28.8547611  -14.0962890   -0.4788915 -140.2863617
+## Jan 1996 1617.836 -209.8803631   28.8547611  -14.0962890   -0.4788915
+## Feb 1996 1613.948 -249.9904087 -209.8803631   28.8547611  -14.0962890
+## Mar 1996 1557.047   46.9737608 -249.9904087 -209.8803631   28.8547611
+## Apr 1996 1552.405   59.7227729   46.9737608 -249.9904087 -209.8803631
+## May 1996 1584.248   87.0153957   59.7227729   46.9737608 -249.9904087
+## Jun 1996 1616.666   50.6254818   87.0153957   59.7227729   46.9737608
+## Jul 1996 1653.305  152.9485041   50.6254818   87.0153957   59.7227729
+## Aug 1996 1709.303  188.5446845  152.9485041   50.6254818   87.0153957
+## Sep 1996 1699.512 -140.2909067  188.5446845  152.9485041   50.6254818
+## Oct 1996 1692.550   -0.4821230 -140.2909067  188.5446845  152.9485041
+## Nov 1996 1635.718  -14.1226705   -0.4821230 -140.2909067  188.5446845
+## Dec 1996 1655.650   28.8640134  -14.1226705   -0.4821230 -140.2909067
+## Jan 1997 1628.314 -209.8930523   28.8640134  -14.1226705   -0.4821230
+## Feb 1997 1624.627 -249.9921202 -209.8930523   28.8640134  -14.1226705
+## Mar 1997 1644.593   46.9830288 -249.9921202 -209.8930523   28.8640134
+## Apr 1997 1616.962   59.7099469   46.9830288 -249.9921202 -209.8930523
+## May 1997 1649.714   87.0305990   59.7099469   46.9830288 -249.9921202
+## Jun 1997 1691.656   50.6449513   87.0305990   59.7099469   46.9830288
+## Jul 1997 1741.465  152.9716254   50.6449513   87.0305990   59.7099469
+## Aug 1997 1784.844  188.5648209  152.9716254   50.6449513   87.0305990
+## Sep 1997 1768.931 -140.2982933  188.5648209  152.9716254   50.6449513
+## Oct 1997 1771.967   -0.4807141 -140.2982933  188.5648209  152.9716254
+## Nov 1997 1757.807  -14.1292435   -0.4807141 -140.2982933  188.5648209
+## Dec 1997 1763.340   28.8665820  -14.1292435   -0.4807141 -140.2982933
+## Jan 1998 1772.724 -209.8886963   28.8665820  -14.1292435   -0.4807141
+## Feb 1998 1711.561 -250.0205118 -209.8886963   28.8665820  -14.1292435
+## Mar 1998 1709.392   46.9820217 -250.0205118 -209.8886963   28.8665820
+## Apr 1998 1740.423   59.7243516   46.9820217 -250.0205118 -209.8886963
+## May 1998 1749.225   87.0346846   59.7243516   46.9820217 -250.0205118
+## Jun 1998 1763.728   50.6516839   87.0346846   59.7243516   46.9820217
+## Jul 1998 1792.337  152.9849057   50.6516839   87.0346846   59.7243516
+## Aug 1998 1759.401  188.5495320  152.9849057   50.6516839   87.0346846
+## Sep 1998 1787.467 -140.2852653  188.5495320  152.9849057   50.6516839
+## Oct 1998 1789.961   -0.4795562 -140.2852653  188.5495320  152.9849057
+## Nov 1998 1812.684  -14.1186955   -0.4795562 -140.2852653  188.5495320
+## Dec 1998 1815.576   28.8679245  -14.1186955   -0.4795562 -140.2852653
+## Jan 1999 1812.097 -209.8903116   28.8679245  -14.1186955   -0.4795562
+## Feb 1999 1804.720 -250.0239361 -209.8903116   28.8679245  -14.1186955
+## Mar 1999 1793.954   46.9770244 -250.0239361 -209.8903116   28.8679245
+## Apr 1999 1786.196   59.7207502   46.9770244 -250.0239361 -209.8903116
+## May 1999 1771.337   87.0277874   59.7207502   46.9770244 -250.0239361
+## Jun 1999 1795.161   50.6627430   87.0277874   59.7207502   46.9770244
+## Jul 1999 1804.942  152.9894458   50.6627430   87.0277874   59.7207502
+## Aug 1999 1780.214  188.5380533  152.9894458   50.6627430   87.0277874
+## Sep 1999 1762.119 -140.2936650  188.5380533  152.9894458   50.6627430
+## Oct 1999 1785.477   -0.4687134 -140.2936650  188.5380533  152.9894458
+## Nov 1999 1829.359  -14.0983255   -0.4687134 -140.2936650  188.5380533
+## Dec 1999 1817.247   28.8623019  -14.0983255   -0.4687134 -140.2936650
+## Jan 2000 1780.732 -209.9072619   28.8623019  -14.0983255   -0.4687134
+## Feb 2000 1828.654 -250.0016904 -209.9072619   28.8623019  -14.0983255
+## Mar 2000 1853.058   46.9883527 -250.0016904 -209.9072619   28.8623019
+## Apr 2000 1885.693   59.7358989   46.9883527 -250.0016904 -209.9072619
+## May 2000 1896.576   87.0328394   59.7358989   46.9883527 -250.0016904
+## Jun 2000 1931.328   50.6788749   87.0328394   59.7358989   46.9883527
+## Jul 2000 1914.475  152.9816226   50.6788749   87.0328394   59.7358989
+## Aug 2000 1911.395  188.5366234  152.9816226   50.6788749   87.0328394
+## Sep 2000 1940.633 -140.2800923  188.5366234  152.9816226   50.6788749
+## Oct 2000 1961.105   -0.4592103 -140.2800923  188.5366234  152.9816226
+## Nov 2000 1980.226  -14.0894497   -0.4592103 -140.2800923  188.5366234
+## Dec 2000 1975.260   28.8599965  -14.0894497   -0.4592103 -140.2800923
+## Jan 2001 1929.569 -209.9284714   28.8599965  -14.0894497   -0.4592103
+## Feb 2001 1920.585 -250.0058607 -209.9284714   28.8599965  -14.0894497
+## Mar 2001 1943.015   46.9987646 -250.0058607 -209.9284714   28.8599965
+## Apr 2001 1954.710   59.7413278   46.9987646 -250.0058607 -209.9284714
+## May 2001 1957.636   87.0341979   59.7413278   46.9987646 -250.0058607
+## Jun 2001 1993.541   50.6955417   87.0341979   59.7413278   46.9987646
+## Jul 2001 1982.533  152.9765126   50.6955417   87.0341979   59.7413278
+## Aug 2001 2000.079  188.5447684  152.9765126   50.6955417   87.0341979
+## Sep 2001 1915.536 -140.3193372  188.5447684  152.9765126   50.6955417
+## Oct 2001 1935.345   -0.4500151 -140.3193372  188.5447684  152.9765126
+## Nov 2001 1964.447  -14.0759407   -0.4500151 -140.3193372  188.5447684
+## Dec 2001 1959.679   28.8577834  -14.0759407   -0.4500151 -140.3193372
+## Jan 2002 1965.170 -209.9259227   28.8577834  -14.0759407   -0.4500151
+## Feb 2002 1995.979 -249.9915589 -209.9259227   28.8577834  -14.0759407
+## Mar 2002 1983.159   46.9928133 -249.9915589 -209.9259227   28.8577834
+## Apr 2002 1986.215   59.7427463   46.9928133 -249.9915589 -209.9259227
+## May 2002 1983.721   87.0330405   59.7427463   46.9928133 -249.9915589
+## Jun 2002 1961.405   50.6851827   87.0330405   59.7427463   46.9928133
+## Jul 2002 1939.660  152.9664183   50.6851827   87.0330405   59.7427463
+## Aug 2002 1883.164  188.5185432  152.9664183   50.6851827   87.0330405
+## Sep 2002 1878.334 -140.3215792  188.5185432  152.9664183   50.6851827
+## Oct 2002 1899.948   -0.4399819 -140.3215792  188.5185432  152.9664183
+## Nov 2002 1884.648  -14.0830430   -0.4399819 -140.3215792  188.5185432
+## Dec 2002 1930.695   28.8791585  -14.0830430   -0.4399819 -140.3215792
+## Jan 2003 1962.523 -209.9111482   28.8791585  -14.0830430   -0.4399819
+## Feb 2003 1983.065 -249.9820236 -209.9111482   28.8791585  -14.0830430
+## Mar 2003 2003.301   47.0022070 -249.9820236 -209.9111482   28.8791585
+## Apr 2003 2023.230   59.7519972   47.0022070 -249.9820236 -209.9111482
+## May 2003 2020.255   87.0316596   59.7519972   47.0022070 -249.9820236
+## Jun 2003 2052.899   50.7003357   87.0316596   59.7519972   47.0022070
+## Jul 2003 2062.617  152.9709293   50.7003357   87.0316596   59.7519972
+## Aug 2003 2019.944  188.4987345  152.9709293   50.7003357   87.0316596
+## Sep 2003 2048.726 -140.3082184  188.4987345  152.9709293   50.7003357
+## Oct 2003 2089.403   -0.4210997 -140.3082184  188.4987345  152.9709293
+## Nov 2003 2089.811  -14.0828536   -0.4210997 -140.3082184  188.4987345
+## Dec 2003 2102.032   28.8848313  -14.0828536   -0.4210997 -140.3082184
+## Jan 2004 2068.342 -209.9267868   28.8848313  -14.0828536   -0.4210997
+## Feb 2004 2079.262 -249.9769548 -209.9267868   28.8848313  -14.0828536
+## Mar 2004 2082.698   47.0038021 -249.9769548 -209.9267868   28.8848313
+##                    s5           s6           s7           s8           s9
+## Dec 1990  188.4889311  152.9658579   50.6988399   87.0291057   59.7614120
+## Jan 1991 -140.3217427  188.4889311  152.9658579   50.6988399   87.0291057
+## Feb 1991   -0.4390261 -140.3217427  188.4889311  152.9658579   50.6988399
+## Mar 1991  -14.0943852   -0.4390261 -140.3217427  188.4889311  152.9658579
+## Apr 1991   28.8704914  -14.0943852   -0.4390261 -140.3217427  188.4889311
+## May 1991 -209.9105160   28.8704914  -14.0943852   -0.4390261 -140.3217427
+## Jun 1991 -250.0023333 -209.9105160   28.8704914  -14.0943852   -0.4390261
+## Jul 1991   46.9955194 -250.0023333 -209.9105160   28.8704914  -14.0943852
+## Aug 1991   59.7228761   46.9955194 -250.0023333 -209.9105160   28.8704914
+## Sep 1991   87.0470861   59.7228761   46.9955194 -250.0023333 -209.9105160
+## Oct 1991   50.6871461   87.0470861   59.7228761   46.9955194 -250.0023333
+## Nov 1991  152.9542746   50.6871461   87.0470861   59.7228761   46.9955194
+## Dec 1991  188.4935596  152.9542746   50.6871461   87.0470861   59.7228761
+## Jan 1992 -140.3425970  188.4935596  152.9542746   50.6871461   87.0470861
+## Feb 1992   -0.4510282 -140.3425970  188.4935596  152.9542746   50.6871461
+## Mar 1992  -14.1089019   -0.4510282 -140.3425970  188.4935596  152.9542746
+## Apr 1992   28.8886138  -14.1089019   -0.4510282 -140.3425970  188.4935596
+## May 1992 -209.8922117   28.8886138  -14.1089019   -0.4510282 -140.3425970
+## Jun 1992 -249.9987560 -209.8922117   28.8886138  -14.1089019   -0.4510282
+## Jul 1992   47.0066901 -249.9987560 -209.8922117   28.8886138  -14.1089019
+## Aug 1992   59.7412624   47.0066901 -249.9987560 -209.8922117   28.8886138
+## Sep 1992   87.0298155   59.7412624   47.0066901 -249.9987560 -209.8922117
+## Oct 1992   50.6213421   87.0298155   59.7412624   47.0066901 -249.9987560
+## Nov 1992  152.9709713   50.6213421   87.0298155   59.7412624   47.0066901
+## Dec 1992  188.5159054  152.9709713   50.6213421   87.0298155   59.7412624
+## Jan 1993 -140.3233776  188.5159054  152.9709713   50.6213421   87.0298155
+## Feb 1993   -0.4512091 -140.3233776  188.5159054  152.9709713   50.6213421
+## Mar 1993  -14.0921448   -0.4512091 -140.3233776  188.5159054  152.9709713
+## Apr 1993   28.8884518  -14.0921448   -0.4512091 -140.3233776  188.5159054
+## May 1993 -209.8745022   28.8884518  -14.0921448   -0.4512091 -140.3233776
+## Jun 1993 -250.0029175 -209.8745022   28.8884518  -14.0921448   -0.4512091
+## Jul 1993   46.9845024 -250.0029175 -209.8745022   28.8884518  -14.0921448
+## Aug 1993   59.7591687   46.9845024 -250.0029175 -209.8745022   28.8884518
+## Sep 1993   87.0204447   59.7591687   46.9845024 -250.0029175 -209.8745022
+## Oct 1993   50.6175981   87.0204447   59.7591687   46.9845024 -250.0029175
+## Nov 1993  152.9559592   50.6175981   87.0204447   59.7591687   46.9845024
+## Dec 1993  188.5163617  152.9559592   50.6175981   87.0204447   59.7591687
+## Jan 1994 -140.3217525  188.5163617  152.9559592   50.6175981   87.0204447
+## Feb 1994   -0.4659384 -140.3217525  188.5163617  152.9559592   50.6175981
+## Mar 1994  -14.1035402   -0.4659384 -140.3217525  188.5163617  152.9559592
+## Apr 1994   28.8758910  -14.1035402   -0.4659384 -140.3217525  188.5163617
+## May 1994 -209.8625792   28.8758910  -14.1035402   -0.4659384 -140.3217525
+## Jun 1994 -249.9845346 -209.8625792   28.8758910  -14.1035402   -0.4659384
+## Jul 1994   47.0008447 -249.9845346 -209.8625792   28.8758910  -14.1035402
+## Aug 1994   59.7453932   47.0008447 -249.9845346 -209.8625792   28.8758910
+## Sep 1994   87.0065597   59.7453932   47.0008447 -249.9845346 -209.8625792
+## Oct 1994   50.6065565   87.0065597   59.7453932   47.0008447 -249.9845346
+## Nov 1994  152.9483236   50.6065565   87.0065597   59.7453932   47.0008447
+## Dec 1994  188.5138834  152.9483236   50.6065565   87.0065597   59.7453932
+## Jan 1995 -140.2950238  188.5138834  152.9483236   50.6065565   87.0065597
+## Feb 1995   -0.4661775 -140.2950238  188.5138834  152.9483236   50.6065565
+## Mar 1995  -14.1007860   -0.4661775 -140.2950238  188.5138834  152.9483236
+## Apr 1995   28.8679229  -14.1007860   -0.4661775 -140.2950238  188.5138834
+## May 1995 -209.8651371   28.8679229  -14.1007860   -0.4661775 -140.2950238
+## Jun 1995 -249.9886039 -209.8651371   28.8679229  -14.1007860   -0.4661775
+## Jul 1995   47.0001739 -249.9886039 -209.8651371   28.8679229  -14.1007860
+## Aug 1995   59.7249278   47.0001739 -249.9886039 -209.8651371   28.8679229
+## Sep 1995   87.0006142   59.7249278   47.0001739 -249.9886039 -209.8651371
+## Oct 1995   50.6104335   87.0006142   59.7249278   47.0001739 -249.9886039
+## Nov 1995  152.9314964   50.6104335   87.0006142   59.7249278   47.0001739
+## Dec 1995  188.5186901  152.9314964   50.6104335   87.0006142   59.7249278
+## Jan 1996 -140.2863617  188.5186901  152.9314964   50.6104335   87.0006142
+## Feb 1996   -0.4788915 -140.2863617  188.5186901  152.9314964   50.6104335
+## Mar 1996  -14.0962890   -0.4788915 -140.2863617  188.5186901  152.9314964
+## Apr 1996   28.8547611  -14.0962890   -0.4788915 -140.2863617  188.5186901
+## May 1996 -209.8803631   28.8547611  -14.0962890   -0.4788915 -140.2863617
+## Jun 1996 -249.9904087 -209.8803631   28.8547611  -14.0962890   -0.4788915
+## Jul 1996   46.9737608 -249.9904087 -209.8803631   28.8547611  -14.0962890
+## Aug 1996   59.7227729   46.9737608 -249.9904087 -209.8803631   28.8547611
+## Sep 1996   87.0153957   59.7227729   46.9737608 -249.9904087 -209.8803631
+## Oct 1996   50.6254818   87.0153957   59.7227729   46.9737608 -249.9904087
+## Nov 1996  152.9485041   50.6254818   87.0153957   59.7227729   46.9737608
+## Dec 1996  188.5446845  152.9485041   50.6254818   87.0153957   59.7227729
+## Jan 1997 -140.2909067  188.5446845  152.9485041   50.6254818   87.0153957
+## Feb 1997   -0.4821230 -140.2909067  188.5446845  152.9485041   50.6254818
+## Mar 1997  -14.1226705   -0.4821230 -140.2909067  188.5446845  152.9485041
+## Apr 1997   28.8640134  -14.1226705   -0.4821230 -140.2909067  188.5446845
+## May 1997 -209.8930523   28.8640134  -14.1226705   -0.4821230 -140.2909067
+## Jun 1997 -249.9921202 -209.8930523   28.8640134  -14.1226705   -0.4821230
+## Jul 1997   46.9830288 -249.9921202 -209.8930523   28.8640134  -14.1226705
+## Aug 1997   59.7099469   46.9830288 -249.9921202 -209.8930523   28.8640134
+## Sep 1997   87.0305990   59.7099469   46.9830288 -249.9921202 -209.8930523
+## Oct 1997   50.6449513   87.0305990   59.7099469   46.9830288 -249.9921202
+## Nov 1997  152.9716254   50.6449513   87.0305990   59.7099469   46.9830288
+## Dec 1997  188.5648209  152.9716254   50.6449513   87.0305990   59.7099469
+## Jan 1998 -140.2982933  188.5648209  152.9716254   50.6449513   87.0305990
+## Feb 1998   -0.4807141 -140.2982933  188.5648209  152.9716254   50.6449513
+## Mar 1998  -14.1292435   -0.4807141 -140.2982933  188.5648209  152.9716254
+## Apr 1998   28.8665820  -14.1292435   -0.4807141 -140.2982933  188.5648209
+## May 1998 -209.8886963   28.8665820  -14.1292435   -0.4807141 -140.2982933
+## Jun 1998 -250.0205118 -209.8886963   28.8665820  -14.1292435   -0.4807141
+## Jul 1998   46.9820217 -250.0205118 -209.8886963   28.8665820  -14.1292435
+## Aug 1998   59.7243516   46.9820217 -250.0205118 -209.8886963   28.8665820
+## Sep 1998   87.0346846   59.7243516   46.9820217 -250.0205118 -209.8886963
+## Oct 1998   50.6516839   87.0346846   59.7243516   46.9820217 -250.0205118
+## Nov 1998  152.9849057   50.6516839   87.0346846   59.7243516   46.9820217
+## Dec 1998  188.5495320  152.9849057   50.6516839   87.0346846   59.7243516
+## Jan 1999 -140.2852653  188.5495320  152.9849057   50.6516839   87.0346846
+## Feb 1999   -0.4795562 -140.2852653  188.5495320  152.9849057   50.6516839
+## Mar 1999  -14.1186955   -0.4795562 -140.2852653  188.5495320  152.9849057
+## Apr 1999   28.8679245  -14.1186955   -0.4795562 -140.2852653  188.5495320
+## May 1999 -209.8903116   28.8679245  -14.1186955   -0.4795562 -140.2852653
+## Jun 1999 -250.0239361 -209.8903116   28.8679245  -14.1186955   -0.4795562
+## Jul 1999   46.9770244 -250.0239361 -209.8903116   28.8679245  -14.1186955
+## Aug 1999   59.7207502   46.9770244 -250.0239361 -209.8903116   28.8679245
+## Sep 1999   87.0277874   59.7207502   46.9770244 -250.0239361 -209.8903116
+## Oct 1999   50.6627430   87.0277874   59.7207502   46.9770244 -250.0239361
+## Nov 1999  152.9894458   50.6627430   87.0277874   59.7207502   46.9770244
+## Dec 1999  188.5380533  152.9894458   50.6627430   87.0277874   59.7207502
+## Jan 2000 -140.2936650  188.5380533  152.9894458   50.6627430   87.0277874
+## Feb 2000   -0.4687134 -140.2936650  188.5380533  152.9894458   50.6627430
+## Mar 2000  -14.0983255   -0.4687134 -140.2936650  188.5380533  152.9894458
+## Apr 2000   28.8623019  -14.0983255   -0.4687134 -140.2936650  188.5380533
+## May 2000 -209.9072619   28.8623019  -14.0983255   -0.4687134 -140.2936650
+## Jun 2000 -250.0016904 -209.9072619   28.8623019  -14.0983255   -0.4687134
+## Jul 2000   46.9883527 -250.0016904 -209.9072619   28.8623019  -14.0983255
+## Aug 2000   59.7358989   46.9883527 -250.0016904 -209.9072619   28.8623019
+## Sep 2000   87.0328394   59.7358989   46.9883527 -250.0016904 -209.9072619
+## Oct 2000   50.6788749   87.0328394   59.7358989   46.9883527 -250.0016904
+## Nov 2000  152.9816226   50.6788749   87.0328394   59.7358989   46.9883527
+## Dec 2000  188.5366234  152.9816226   50.6788749   87.0328394   59.7358989
+## Jan 2001 -140.2800923  188.5366234  152.9816226   50.6788749   87.0328394
+## Feb 2001   -0.4592103 -140.2800923  188.5366234  152.9816226   50.6788749
+## Mar 2001  -14.0894497   -0.4592103 -140.2800923  188.5366234  152.9816226
+## Apr 2001   28.8599965  -14.0894497   -0.4592103 -140.2800923  188.5366234
+## May 2001 -209.9284714   28.8599965  -14.0894497   -0.4592103 -140.2800923
+## Jun 2001 -250.0058607 -209.9284714   28.8599965  -14.0894497   -0.4592103
+## Jul 2001   46.9987646 -250.0058607 -209.9284714   28.8599965  -14.0894497
+## Aug 2001   59.7413278   46.9987646 -250.0058607 -209.9284714   28.8599965
+## Sep 2001   87.0341979   59.7413278   46.9987646 -250.0058607 -209.9284714
+## Oct 2001   50.6955417   87.0341979   59.7413278   46.9987646 -250.0058607
+## Nov 2001  152.9765126   50.6955417   87.0341979   59.7413278   46.9987646
+## Dec 2001  188.5447684  152.9765126   50.6955417   87.0341979   59.7413278
+## Jan 2002 -140.3193372  188.5447684  152.9765126   50.6955417   87.0341979
+## Feb 2002   -0.4500151 -140.3193372  188.5447684  152.9765126   50.6955417
+## Mar 2002  -14.0759407   -0.4500151 -140.3193372  188.5447684  152.9765126
+## Apr 2002   28.8577834  -14.0759407   -0.4500151 -140.3193372  188.5447684
+## May 2002 -209.9259227   28.8577834  -14.0759407   -0.4500151 -140.3193372
+## Jun 2002 -249.9915589 -209.9259227   28.8577834  -14.0759407   -0.4500151
+## Jul 2002   46.9928133 -249.9915589 -209.9259227   28.8577834  -14.0759407
+## Aug 2002   59.7427463   46.9928133 -249.9915589 -209.9259227   28.8577834
+## Sep 2002   87.0330405   59.7427463   46.9928133 -249.9915589 -209.9259227
+## Oct 2002   50.6851827   87.0330405   59.7427463   46.9928133 -249.9915589
+## Nov 2002  152.9664183   50.6851827   87.0330405   59.7427463   46.9928133
+## Dec 2002  188.5185432  152.9664183   50.6851827   87.0330405   59.7427463
+## Jan 2003 -140.3215792  188.5185432  152.9664183   50.6851827   87.0330405
+## Feb 2003   -0.4399819 -140.3215792  188.5185432  152.9664183   50.6851827
+## Mar 2003  -14.0830430   -0.4399819 -140.3215792  188.5185432  152.9664183
+## Apr 2003   28.8791585  -14.0830430   -0.4399819 -140.3215792  188.5185432
+## May 2003 -209.9111482   28.8791585  -14.0830430   -0.4399819 -140.3215792
+## Jun 2003 -249.9820236 -209.9111482   28.8791585  -14.0830430   -0.4399819
+## Jul 2003   47.0022070 -249.9820236 -209.9111482   28.8791585  -14.0830430
+## Aug 2003   59.7519972   47.0022070 -249.9820236 -209.9111482   28.8791585
+## Sep 2003   87.0316596   59.7519972   47.0022070 -249.9820236 -209.9111482
+## Oct 2003   50.7003357   87.0316596   59.7519972   47.0022070 -249.9820236
+## Nov 2003  152.9709293   50.7003357   87.0316596   59.7519972   47.0022070
+## Dec 2003  188.4987345  152.9709293   50.7003357   87.0316596   59.7519972
+## Jan 2004 -140.3082184  188.4987345  152.9709293   50.7003357   87.0316596
+## Feb 2004   -0.4210997 -140.3082184  188.4987345  152.9709293   50.7003357
+## Mar 2004  -14.0828536   -0.4210997 -140.3082184  188.4987345  152.9709293
+##                   s10          s11          s12
+## Dec 1990   46.9813047 -250.0023034 -209.9384853
+## Jan 1991   59.7614120   46.9813047 -250.0023034
+## Feb 1991   87.0291057   59.7614120   46.9813047
+## Mar 1991   50.6988399   87.0291057   59.7614120
+## Apr 1991  152.9658579   50.6988399   87.0291057
+## May 1991  188.4889311  152.9658579   50.6988399
+## Jun 1991 -140.3217427  188.4889311  152.9658579
+## Jul 1991   -0.4390261 -140.3217427  188.4889311
+## Aug 1991  -14.0943852   -0.4390261 -140.3217427
+## Sep 1991   28.8704914  -14.0943852   -0.4390261
+## Oct 1991 -209.9105160   28.8704914  -14.0943852
+## Nov 1991 -250.0023333 -209.9105160   28.8704914
+## Dec 1991   46.9955194 -250.0023333 -209.9105160
+## Jan 1992   59.7228761   46.9955194 -250.0023333
+## Feb 1992   87.0470861   59.7228761   46.9955194
+## Mar 1992   50.6871461   87.0470861   59.7228761
+## Apr 1992  152.9542746   50.6871461   87.0470861
+## May 1992  188.4935596  152.9542746   50.6871461
+## Jun 1992 -140.3425970  188.4935596  152.9542746
+## Jul 1992   -0.4510282 -140.3425970  188.4935596
+## Aug 1992  -14.1089019   -0.4510282 -140.3425970
+## Sep 1992   28.8886138  -14.1089019   -0.4510282
+## Oct 1992 -209.8922117   28.8886138  -14.1089019
+## Nov 1992 -249.9987560 -209.8922117   28.8886138
+## Dec 1992   47.0066901 -249.9987560 -209.8922117
+## Jan 1993   59.7412624   47.0066901 -249.9987560
+## Feb 1993   87.0298155   59.7412624   47.0066901
+## Mar 1993   50.6213421   87.0298155   59.7412624
+## Apr 1993  152.9709713   50.6213421   87.0298155
+## May 1993  188.5159054  152.9709713   50.6213421
+## Jun 1993 -140.3233776  188.5159054  152.9709713
+## Jul 1993   -0.4512091 -140.3233776  188.5159054
+## Aug 1993  -14.0921448   -0.4512091 -140.3233776
+## Sep 1993   28.8884518  -14.0921448   -0.4512091
+## Oct 1993 -209.8745022   28.8884518  -14.0921448
+## Nov 1993 -250.0029175 -209.8745022   28.8884518
+## Dec 1993   46.9845024 -250.0029175 -209.8745022
+## Jan 1994   59.7591687   46.9845024 -250.0029175
+## Feb 1994   87.0204447   59.7591687   46.9845024
+## Mar 1994   50.6175981   87.0204447   59.7591687
+## Apr 1994  152.9559592   50.6175981   87.0204447
+## May 1994  188.5163617  152.9559592   50.6175981
+## Jun 1994 -140.3217525  188.5163617  152.9559592
+## Jul 1994   -0.4659384 -140.3217525  188.5163617
+## Aug 1994  -14.1035402   -0.4659384 -140.3217525
+## Sep 1994   28.8758910  -14.1035402   -0.4659384
+## Oct 1994 -209.8625792   28.8758910  -14.1035402
+## Nov 1994 -249.9845346 -209.8625792   28.8758910
+## Dec 1994   47.0008447 -249.9845346 -209.8625792
+## Jan 1995   59.7453932   47.0008447 -249.9845346
+## Feb 1995   87.0065597   59.7453932   47.0008447
+## Mar 1995   50.6065565   87.0065597   59.7453932
+## Apr 1995  152.9483236   50.6065565   87.0065597
+## May 1995  188.5138834  152.9483236   50.6065565
+## Jun 1995 -140.2950238  188.5138834  152.9483236
+## Jul 1995   -0.4661775 -140.2950238  188.5138834
+## Aug 1995  -14.1007860   -0.4661775 -140.2950238
+## Sep 1995   28.8679229  -14.1007860   -0.4661775
+## Oct 1995 -209.8651371   28.8679229  -14.1007860
+## Nov 1995 -249.9886039 -209.8651371   28.8679229
+## Dec 1995   47.0001739 -249.9886039 -209.8651371
+## Jan 1996   59.7249278   47.0001739 -249.9886039
+## Feb 1996   87.0006142   59.7249278   47.0001739
+## Mar 1996   50.6104335   87.0006142   59.7249278
+## Apr 1996  152.9314964   50.6104335   87.0006142
+## May 1996  188.5186901  152.9314964   50.6104335
+## Jun 1996 -140.2863617  188.5186901  152.9314964
+## Jul 1996   -0.4788915 -140.2863617  188.5186901
+## Aug 1996  -14.0962890   -0.4788915 -140.2863617
+## Sep 1996   28.8547611  -14.0962890   -0.4788915
+## Oct 1996 -209.8803631   28.8547611  -14.0962890
+## Nov 1996 -249.9904087 -209.8803631   28.8547611
+## Dec 1996   46.9737608 -249.9904087 -209.8803631
+## Jan 1997   59.7227729   46.9737608 -249.9904087
+## Feb 1997   87.0153957   59.7227729   46.9737608
+## Mar 1997   50.6254818   87.0153957   59.7227729
+## Apr 1997  152.9485041   50.6254818   87.0153957
+## May 1997  188.5446845  152.9485041   50.6254818
+## Jun 1997 -140.2909067  188.5446845  152.9485041
+## Jul 1997   -0.4821230 -140.2909067  188.5446845
+## Aug 1997  -14.1226705   -0.4821230 -140.2909067
+## Sep 1997   28.8640134  -14.1226705   -0.4821230
+## Oct 1997 -209.8930523   28.8640134  -14.1226705
+## Nov 1997 -249.9921202 -209.8930523   28.8640134
+## Dec 1997   46.9830288 -249.9921202 -209.8930523
+## Jan 1998   59.7099469   46.9830288 -249.9921202
+## Feb 1998   87.0305990   59.7099469   46.9830288
+## Mar 1998   50.6449513   87.0305990   59.7099469
+## Apr 1998  152.9716254   50.6449513   87.0305990
+## May 1998  188.5648209  152.9716254   50.6449513
+## Jun 1998 -140.2982933  188.5648209  152.9716254
+## Jul 1998   -0.4807141 -140.2982933  188.5648209
+## Aug 1998  -14.1292435   -0.4807141 -140.2982933
+## Sep 1998   28.8665820  -14.1292435   -0.4807141
+## Oct 1998 -209.8886963   28.8665820  -14.1292435
+## Nov 1998 -250.0205118 -209.8886963   28.8665820
+## Dec 1998   46.9820217 -250.0205118 -209.8886963
+## Jan 1999   59.7243516   46.9820217 -250.0205118
+## Feb 1999   87.0346846   59.7243516   46.9820217
+## Mar 1999   50.6516839   87.0346846   59.7243516
+## Apr 1999  152.9849057   50.6516839   87.0346846
+## May 1999  188.5495320  152.9849057   50.6516839
+## Jun 1999 -140.2852653  188.5495320  152.9849057
+## Jul 1999   -0.4795562 -140.2852653  188.5495320
+## Aug 1999  -14.1186955   -0.4795562 -140.2852653
+## Sep 1999   28.8679245  -14.1186955   -0.4795562
+## Oct 1999 -209.8903116   28.8679245  -14.1186955
+## Nov 1999 -250.0239361 -209.8903116   28.8679245
+## Dec 1999   46.9770244 -250.0239361 -209.8903116
+## Jan 2000   59.7207502   46.9770244 -250.0239361
+## Feb 2000   87.0277874   59.7207502   46.9770244
+## Mar 2000   50.6627430   87.0277874   59.7207502
+## Apr 2000  152.9894458   50.6627430   87.0277874
+## May 2000  188.5380533  152.9894458   50.6627430
+## Jun 2000 -140.2936650  188.5380533  152.9894458
+## Jul 2000   -0.4687134 -140.2936650  188.5380533
+## Aug 2000  -14.0983255   -0.4687134 -140.2936650
+## Sep 2000   28.8623019  -14.0983255   -0.4687134
+## Oct 2000 -209.9072619   28.8623019  -14.0983255
+## Nov 2000 -250.0016904 -209.9072619   28.8623019
+## Dec 2000   46.9883527 -250.0016904 -209.9072619
+## Jan 2001   59.7358989   46.9883527 -250.0016904
+## Feb 2001   87.0328394   59.7358989   46.9883527
+## Mar 2001   50.6788749   87.0328394   59.7358989
+## Apr 2001  152.9816226   50.6788749   87.0328394
+## May 2001  188.5366234  152.9816226   50.6788749
+## Jun 2001 -140.2800923  188.5366234  152.9816226
+## Jul 2001   -0.4592103 -140.2800923  188.5366234
+## Aug 2001  -14.0894497   -0.4592103 -140.2800923
+## Sep 2001   28.8599965  -14.0894497   -0.4592103
+## Oct 2001 -209.9284714   28.8599965  -14.0894497
+## Nov 2001 -250.0058607 -209.9284714   28.8599965
+## Dec 2001   46.9987646 -250.0058607 -209.9284714
+## Jan 2002   59.7413278   46.9987646 -250.0058607
+## Feb 2002   87.0341979   59.7413278   46.9987646
+## Mar 2002   50.6955417   87.0341979   59.7413278
+## Apr 2002  152.9765126   50.6955417   87.0341979
+## May 2002  188.5447684  152.9765126   50.6955417
+## Jun 2002 -140.3193372  188.5447684  152.9765126
+## Jul 2002   -0.4500151 -140.3193372  188.5447684
+## Aug 2002  -14.0759407   -0.4500151 -140.3193372
+## Sep 2002   28.8577834  -14.0759407   -0.4500151
+## Oct 2002 -209.9259227   28.8577834  -14.0759407
+## Nov 2002 -249.9915589 -209.9259227   28.8577834
+## Dec 2002   46.9928133 -249.9915589 -209.9259227
+## Jan 2003   59.7427463   46.9928133 -249.9915589
+## Feb 2003   87.0330405   59.7427463   46.9928133
+## Mar 2003   50.6851827   87.0330405   59.7427463
+## Apr 2003  152.9664183   50.6851827   87.0330405
+## May 2003  188.5185432  152.9664183   50.6851827
+## Jun 2003 -140.3215792  188.5185432  152.9664183
+## Jul 2003   -0.4399819 -140.3215792  188.5185432
+## Aug 2003  -14.0830430   -0.4399819 -140.3215792
+## Sep 2003   28.8791585  -14.0830430   -0.4399819
+## Oct 2003 -209.9111482   28.8791585  -14.0830430
+## Nov 2003 -249.9820236 -209.9111482   28.8791585
+## Dec 2003   47.0022070 -249.9820236 -209.9111482
+## Jan 2004   59.7519972   47.0022070 -249.9820236
+## Feb 2004   87.0316596   59.7519972   47.0022070
+## Mar 2004   50.7003357   87.0316596   59.7519972
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-6 Tab 5-2 5-4 5-5-1.pdf}
+
+\begin{verbatim}
+## ETS(M,A,A) 
+## 
+## Call:
+##  ets(y = train.ts, model = "MAA") 
+## 
+##   Smoothing parameters:
+##     alpha = 0.5518 
+##     beta  = 1e-04 
+##     gamma = 1e-04 
+## 
+##   Initial states:
+##     l = 1838.577 
+##     b = 0.8081 
+##     s=28.4454 -11.2187 -0.5337 -124.2766 200.1969 146.8103
+##            36.5908 76.044 60.153 44.1791 -249.4682 -206.9221
+## 
+##   sigma:  0.0342
+## 
+##      AIC     AICc      BIC 
+## 1617.596 1623.424 1665.403
+\end{verbatim}
+
+\begin{verbatim}
+##            l            b           s1           s2           s3 
+## 1838.5770301    0.8081064   28.4453626  -11.2186753   -0.5336870 
+##           s4           s5           s6           s7           s8 
+## -124.2766167  200.1968557  146.8102880   36.5907511   76.0439635 
+##           s9          s10          s11          s12 
+##   60.1530346   44.1790580 -249.4681974 -206.9221371
+\end{verbatim}
+
+\begin{verbatim}
+##            l            b           s1           s2           s3 
+## 1944.5564806    0.8100101   44.1899049 -249.4709519 -206.9249239 
+##           s4           s5           s6           s7           s8 
+##   28.4436406  -11.2161757   -0.5324645 -124.2747514  200.1936173 
+##           s9          s10          s11          s12 
+##  146.8106008   36.5892133   76.0565944   60.1377124
+\end{verbatim}
+
+\begin{verbatim}
+##                 l         b           s1           s2           s3
+## Dec 1990 1838.577 0.8081064   28.4453626  -11.2186753   -0.5336870
+## Jan 1991 1881.572 0.8166687 -206.9130684   28.4453626  -11.2186753
+## Feb 1991 1875.582 0.8152873 -249.4696605 -206.9130684   28.4453626
+## Mar 1991 1905.167 0.8211264   44.1852425 -249.4696605 -206.9130684
+## Apr 1991 1820.750 0.8038262   60.1347112   44.1852425 -249.4696605
+## May 1991 1864.244 0.8124907   76.0531404   60.1347112   44.1852425
+## Jun 1991 1843.376 0.8080904   36.5860906   76.0531404   60.1347112
+## Jul 1991 1815.969 0.8023637  146.8042226   36.5860906   76.0531404
+## Aug 1991 1814.727 0.8019489  200.1964164  146.8042226   36.5860906
+## Sep 1991 1762.781 0.7912429 -124.2879560  200.1964164  146.8042226
+## Oct 1991 1742.541 0.7869744   -0.5382079 -124.2879560  200.1964164
+## Nov 1991 1712.184 0.7806532  -11.2253703   -0.5382079 -124.2879560
+## Dec 1991 1752.943 0.7887675   28.4539567  -11.2253703   -0.5382079
+## Jan 1992 1791.258 0.7963839 -206.9050015   28.4539567  -11.2253703
+## Feb 1992 1800.057 0.7980082 -249.4679402 -206.9050015   28.4539567
+## Mar 1992 1826.338 0.8031803   44.1907205 -249.4679402 -206.9050015
+## Apr 1992 1865.052 0.8108747   60.1428607   44.1907205 -249.4679402
+## May 1992 1834.299 0.8044685   76.0463553   60.1428607   44.1907205
+## Jun 1992 1697.903 0.7766217   36.5565967   76.0463553   60.1428607
+## Jul 1992 1730.587 0.7830978  146.8110817   36.5565967   76.0463553
+## Aug 1992 1767.317 0.7903936  200.2041437  146.8110817   36.5565967
+## Sep 1992 1801.257 0.7971219 -124.2808297  200.2041437  146.8110817
+## Oct 1992 1806.736 0.7980720   -0.5372016 -124.2808297  200.2041437
+## Nov 1992 1843.561 0.8053844  -11.2176255   -0.5372016 -124.2808297
+## Dec 1992 1845.637 0.8056421   28.4542297  -11.2176255   -0.5372016
+## Jan 1993 1882.707 0.8130024 -206.8972058   28.4542297  -11.2176255
+## Feb 1993 1874.958 0.8112647 -249.4697807 -206.8972058   28.4542297
+## Mar 1993 1829.832 0.8019412   44.1808456 -249.4697807 -206.8972058
+## Apr 1993 1867.199 0.8093625   60.1507210   44.1808456 -249.4697807
+## May 1993 1853.182 0.8063533   76.0431681   60.1507210   44.1808456
+## Jun 1993 1849.493 0.8054409   36.5556304   76.0431681   60.1507210
+## Jul 1993 1814.928 0.7982621  146.8034783   36.5556304   76.0431681
+## Aug 1993 1804.821 0.7960487  200.2017994  146.8034783   36.5556304
+## Sep 1993 1800.930 0.7950972 -124.2818374  200.2017994  146.8034783
+## Oct 1993 1775.040 0.7896812   -0.5429380 -124.2818374  200.2017994
+## Nov 1993 1751.421 0.7847272  -11.2228725   -0.5429380 -124.2818374
+## Dec 1993 1726.621 0.7795343   28.4487297  -11.2228725   -0.5429380
+## Jan 1994 1751.051 0.7843346 -206.8921216   28.4487297  -11.2228725
+## Feb 1994 1791.340 0.7923525 -249.4612885 -206.8921216   28.4487297
+## Mar 1994 1828.730 0.7997806   44.1887130 -249.4612885 -206.8921216
+## Apr 1994 1798.744 0.7935322   60.1441030   44.1887130 -249.4612885
+## May 1994 1774.965 0.7885450   76.0378859   60.1441030   44.1887130
+## Jun 1994 1755.584 0.7844511   36.5512944   76.0378859   60.1441030
+## Jul 1994 1736.689 0.7804570  146.7992480   36.5512944   76.0378859
+## Aug 1994 1720.329 0.7769781  200.1981147  146.7992480   36.5512944
+## Sep 1994 1770.109 0.7869240 -124.2713033  200.1981147  146.7992480
+## Oct 1994 1775.417 0.7878415   -0.5419662 -124.2713033  200.1981147
+## Nov 1994 1782.282 0.7890749  -11.2215662   -0.5419662 -124.2713033
+## Dec 1994 1767.527 0.7859201   28.4453883  -11.2215662   -0.5419662
+## Jan 1995 1761.137 0.7844635 -206.8936643   28.4453883  -11.2215662
+## Feb 1995 1753.349 0.7827238 -249.4631312 -206.8936643   28.4453883
+## Mar 1995 1754.129 0.7827232   44.1887124 -249.4631312 -206.8936643
+## Apr 1995 1709.576 0.7735218   60.1343574   44.1887124 -249.4631312
+## May 1995 1702.601 0.7719491   76.0362202   60.1343574   44.1887124
+## Jun 1995 1715.117 0.7743326   36.5538189   76.0362202   60.1343574
+## Jul 1995 1676.695 0.7663771  146.7908221   36.5538189   76.0362202
+## Aug 1995 1675.894 0.7660592  200.1977780  146.7908221   36.5538189
+## Sep 1995 1687.100 0.7681781 -124.2690591  200.1977780  146.7908221
+## Oct 1995 1665.588 0.7636560   -0.5467558 -124.2690591  200.1977780
+## Nov 1995 1676.008 0.7656160  -11.2194903   -0.5467558 -124.2690591
+## Dec 1995 1650.082 0.7601984   28.4396503  -11.2194903   -0.5467558
+## Jan 1996 1616.526 0.7532335 -206.9010411   28.4396503  -11.2194903
+## Feb 1996 1613.437 0.7524536 -249.4639573 -206.9010411   28.4396503
+## Mar 1996 1559.119 0.7412764   44.1768742 -249.4639573 -206.9010411
+## Apr 1996 1553.474 0.7399801   60.1329844   44.1768742 -249.4639573
+## May 1996 1590.878 0.7474216   76.0441018   60.1329844   44.1768742
+## Jun 1996 1627.494 0.7547016   36.5615294   76.0441018   60.1329844
+## Jul 1996 1661.619 0.7614746  146.7979956   36.5615294   76.0441018
+## Aug 1996 1706.521 0.7704334  200.2072667  146.7979956   36.5615294
+## Sep 1996 1689.843 0.7668921 -124.2728099  200.2072667  146.7979956
+## Oct 1996 1688.648 0.7664940   -0.5471774 -124.2728099  200.2072667
+## Nov 1996 1633.137 0.7550717  -11.2315881   -0.5471774 -124.2728099
+## Dec 1996 1654.916 0.7593388   28.4441697  -11.2315881   -0.5471774
+## Jan 1997 1626.880 0.7534943 -206.9072313   28.4441697  -11.2315881
+## Feb 1997 1624.058 0.7527687 -249.4647258 -206.9072313   28.4441697
+## Mar 1997 1646.074 0.7570842   44.1814450 -249.4647258 -206.9072313
+## Apr 1997 1617.939 0.7512203   60.1267737   44.1814450 -249.4647258
+## May 1997 1656.305 0.7588547   76.0521877   60.1267737   44.1814450
+## Jun 1997 1702.407 0.7680577   36.5712767   76.0521877   60.1267737
+## Jul 1997 1749.661 0.7774926  146.8079886   36.5712767   76.0521877
+## Aug 1997 1782.116 0.7839221  200.2140764  146.8079886   36.5712767
+## Sep 1997 1759.337 0.7791396 -124.2778752  200.2140764  146.8079886
+## Oct 1997 1768.029 0.7807457   -0.5454763 -124.2778752  200.2140764
+## Nov 1997 1754.899 0.7779223  -11.2345785   -0.5454763 -124.2778752
+## Dec 1997 1762.577 0.7793227   28.4456530  -11.2345785   -0.5454763
+## Jan 1998 1771.016 0.7808773 -206.9055848   28.4456530  -11.2345785
+## Feb 1998 1711.298 0.7685983 -249.4777310 -206.9055848   28.4456530
+## Mar 1998 1711.180 0.7684183   44.1812544 -249.4777310 -206.9055848
+## Apr 1998 1741.114 0.7743379   60.1330434   44.1812544 -249.4777310
+## May 1998 1755.875 0.7771768   76.0551945   60.1330434   44.1812544
+## Jun 1998 1774.718 0.7808434   36.5751602   76.0551945   60.1330434
+## Jul 1998 1800.807 0.7859800  146.8134290   36.5751602   76.0551945
+## Aug 1998 1757.360 0.7770024  200.2045679  146.8134290   36.5751602
+## Sep 1998 1777.857 0.7810047 -124.2736362  200.2045679  146.8134290
+## Oct 1998 1786.022 0.7825034   -0.5438891 -124.2736362  200.2045679
+## Nov 1998 1809.507 0.7871113  -11.2296981   -0.5438891 -124.2736362
+## Dec 1998 1814.716 0.7880088   28.4466036  -11.2296981   -0.5438891
+## Jan 1999 1810.443 0.7869816 -206.9066727   28.4466036  -11.2296981
+## Feb 1999 1804.085 0.7855314 -249.4792670 -206.9066727   28.4466036
+## Mar 1999 1795.646 0.7836590   44.1792712 -249.4792670 -206.9066727
+## Apr 1999 1787.136 0.7817728   60.1310456   44.1792712 -249.4792670
+## May 1999 1778.275 0.7798157   76.0531217   60.1310456   44.1792712
+## Jun 1999 1806.215 0.7853282   36.5809988   76.0531217   60.1310456
+## Jul 1999 1813.583 0.7866642  146.8148440   36.5809988   76.0531217
+## Aug 1999 1778.188 0.7793206  200.1967899  146.8148440   36.5809988
+## Sep 1999 1752.856 0.7740211 -124.2792491  200.1967899  146.8148440
+## Oct 1999 1781.538 0.7796854   -0.5378897 -124.2792491  200.1967899
+## Nov 1999 1826.031 0.7885576  -11.2203012   -0.5378897 -124.2792491
+## Dec 1999 1816.429 0.7864486   28.4443699  -11.2203012   -0.5378897
+## Jan 2000 1779.336 0.7787605 -206.9148156   28.4443699  -11.2203012
+## Feb 2000 1827.730 0.7884246 -249.4690312 -206.9148156   28.4443699
+## Mar 2000 1854.364 0.7936704   44.1848272 -249.4690312 -206.9148156
+## Apr 2000 1886.171 0.7999649   60.1377124   44.1848272 -249.4690312
+## May 2000 1903.126 0.8032437   76.0565944   60.1377124   44.1848272
+## Jun 2000 1942.142 0.8109996   36.5892133   76.0565944   60.1377124
+## Jul 2000 1923.214 0.8069934  146.8106008   36.5892133   76.0565944
+## Aug 2000 1909.263 0.8039979  200.1936173  146.8106008   36.5892133
+## Sep 2000 1930.990 0.8082445 -124.2747514  200.1936173  146.8106008
+## Oct 2000 1957.035 0.8133667   -0.5324645 -124.2747514  200.1936173
+## Nov 2000 1977.040 0.8172618  -11.2161757   -0.5324645 -124.2747514
+## Dec 2000 1974.464 0.8165733   28.4436406  -11.2161757   -0.5324645
+## Jan 2001 1928.259 0.8070294 -206.9249239   28.4436406  -11.2161757
+## Feb 2001 1920.131 0.8052160 -249.4709519 -206.9249239   28.4436406
+## Mar 2001 1944.556 0.8100101   44.1899049 -249.4709519 -206.9249239
+##                    s4           s5           s6           s7           s8
+## Dec 1990 -124.2766167  200.1968557  146.8102880   36.5907511   76.0439635
+## Jan 1991   -0.5336870 -124.2766167  200.1968557  146.8102880   36.5907511
+## Feb 1991  -11.2186753   -0.5336870 -124.2766167  200.1968557  146.8102880
+## Mar 1991   28.4453626  -11.2186753   -0.5336870 -124.2766167  200.1968557
+## Apr 1991 -206.9130684   28.4453626  -11.2186753   -0.5336870 -124.2766167
+## May 1991 -249.4696605 -206.9130684   28.4453626  -11.2186753   -0.5336870
+## Jun 1991   44.1852425 -249.4696605 -206.9130684   28.4453626  -11.2186753
+## Jul 1991   60.1347112   44.1852425 -249.4696605 -206.9130684   28.4453626
+## Aug 1991   76.0531404   60.1347112   44.1852425 -249.4696605 -206.9130684
+## Sep 1991   36.5860906   76.0531404   60.1347112   44.1852425 -249.4696605
+## Oct 1991  146.8042226   36.5860906   76.0531404   60.1347112   44.1852425
+## Nov 1991  200.1964164  146.8042226   36.5860906   76.0531404   60.1347112
+## Dec 1991 -124.2879560  200.1964164  146.8042226   36.5860906   76.0531404
+## Jan 1992   -0.5382079 -124.2879560  200.1964164  146.8042226   36.5860906
+## Feb 1992  -11.2253703   -0.5382079 -124.2879560  200.1964164  146.8042226
+## Mar 1992   28.4539567  -11.2253703   -0.5382079 -124.2879560  200.1964164
+## Apr 1992 -206.9050015   28.4539567  -11.2253703   -0.5382079 -124.2879560
+## May 1992 -249.4679402 -206.9050015   28.4539567  -11.2253703   -0.5382079
+## Jun 1992   44.1907205 -249.4679402 -206.9050015   28.4539567  -11.2253703
+## Jul 1992   60.1428607   44.1907205 -249.4679402 -206.9050015   28.4539567
+## Aug 1992   76.0463553   60.1428607   44.1907205 -249.4679402 -206.9050015
+## Sep 1992   36.5565967   76.0463553   60.1428607   44.1907205 -249.4679402
+## Oct 1992  146.8110817   36.5565967   76.0463553   60.1428607   44.1907205
+## Nov 1992  200.2041437  146.8110817   36.5565967   76.0463553   60.1428607
+## Dec 1992 -124.2808297  200.2041437  146.8110817   36.5565967   76.0463553
+## Jan 1993   -0.5372016 -124.2808297  200.2041437  146.8110817   36.5565967
+## Feb 1993  -11.2176255   -0.5372016 -124.2808297  200.2041437  146.8110817
+## Mar 1993   28.4542297  -11.2176255   -0.5372016 -124.2808297  200.2041437
+## Apr 1993 -206.8972058   28.4542297  -11.2176255   -0.5372016 -124.2808297
+## May 1993 -249.4697807 -206.8972058   28.4542297  -11.2176255   -0.5372016
+## Jun 1993   44.1808456 -249.4697807 -206.8972058   28.4542297  -11.2176255
+## Jul 1993   60.1507210   44.1808456 -249.4697807 -206.8972058   28.4542297
+## Aug 1993   76.0431681   60.1507210   44.1808456 -249.4697807 -206.8972058
+## Sep 1993   36.5556304   76.0431681   60.1507210   44.1808456 -249.4697807
+## Oct 1993  146.8034783   36.5556304   76.0431681   60.1507210   44.1808456
+## Nov 1993  200.2017994  146.8034783   36.5556304   76.0431681   60.1507210
+## Dec 1993 -124.2818374  200.2017994  146.8034783   36.5556304   76.0431681
+## Jan 1994   -0.5429380 -124.2818374  200.2017994  146.8034783   36.5556304
+## Feb 1994  -11.2228725   -0.5429380 -124.2818374  200.2017994  146.8034783
+## Mar 1994   28.4487297  -11.2228725   -0.5429380 -124.2818374  200.2017994
+## Apr 1994 -206.8921216   28.4487297  -11.2228725   -0.5429380 -124.2818374
+## May 1994 -249.4612885 -206.8921216   28.4487297  -11.2228725   -0.5429380
+## Jun 1994   44.1887130 -249.4612885 -206.8921216   28.4487297  -11.2228725
+## Jul 1994   60.1441030   44.1887130 -249.4612885 -206.8921216   28.4487297
+## Aug 1994   76.0378859   60.1441030   44.1887130 -249.4612885 -206.8921216
+## Sep 1994   36.5512944   76.0378859   60.1441030   44.1887130 -249.4612885
+## Oct 1994  146.7992480   36.5512944   76.0378859   60.1441030   44.1887130
+## Nov 1994  200.1981147  146.7992480   36.5512944   76.0378859   60.1441030
+## Dec 1994 -124.2713033  200.1981147  146.7992480   36.5512944   76.0378859
+## Jan 1995   -0.5419662 -124.2713033  200.1981147  146.7992480   36.5512944
+## Feb 1995  -11.2215662   -0.5419662 -124.2713033  200.1981147  146.7992480
+## Mar 1995   28.4453883  -11.2215662   -0.5419662 -124.2713033  200.1981147
+## Apr 1995 -206.8936643   28.4453883  -11.2215662   -0.5419662 -124.2713033
+## May 1995 -249.4631312 -206.8936643   28.4453883  -11.2215662   -0.5419662
+## Jun 1995   44.1887124 -249.4631312 -206.8936643   28.4453883  -11.2215662
+## Jul 1995   60.1343574   44.1887124 -249.4631312 -206.8936643   28.4453883
+## Aug 1995   76.0362202   60.1343574   44.1887124 -249.4631312 -206.8936643
+## Sep 1995   36.5538189   76.0362202   60.1343574   44.1887124 -249.4631312
+## Oct 1995  146.7908221   36.5538189   76.0362202   60.1343574   44.1887124
+## Nov 1995  200.1977780  146.7908221   36.5538189   76.0362202   60.1343574
+## Dec 1995 -124.2690591  200.1977780  146.7908221   36.5538189   76.0362202
+## Jan 1996   -0.5467558 -124.2690591  200.1977780  146.7908221   36.5538189
+## Feb 1996  -11.2194903   -0.5467558 -124.2690591  200.1977780  146.7908221
+## Mar 1996   28.4396503  -11.2194903   -0.5467558 -124.2690591  200.1977780
+## Apr 1996 -206.9010411   28.4396503  -11.2194903   -0.5467558 -124.2690591
+## May 1996 -249.4639573 -206.9010411   28.4396503  -11.2194903   -0.5467558
+## Jun 1996   44.1768742 -249.4639573 -206.9010411   28.4396503  -11.2194903
+## Jul 1996   60.1329844   44.1768742 -249.4639573 -206.9010411   28.4396503
+## Aug 1996   76.0441018   60.1329844   44.1768742 -249.4639573 -206.9010411
+## Sep 1996   36.5615294   76.0441018   60.1329844   44.1768742 -249.4639573
+## Oct 1996  146.7979956   36.5615294   76.0441018   60.1329844   44.1768742
+## Nov 1996  200.2072667  146.7979956   36.5615294   76.0441018   60.1329844
+## Dec 1996 -124.2728099  200.2072667  146.7979956   36.5615294   76.0441018
+## Jan 1997   -0.5471774 -124.2728099  200.2072667  146.7979956   36.5615294
+## Feb 1997  -11.2315881   -0.5471774 -124.2728099  200.2072667  146.7979956
+## Mar 1997   28.4441697  -11.2315881   -0.5471774 -124.2728099  200.2072667
+## Apr 1997 -206.9072313   28.4441697  -11.2315881   -0.5471774 -124.2728099
+## May 1997 -249.4647258 -206.9072313   28.4441697  -11.2315881   -0.5471774
+## Jun 1997   44.1814450 -249.4647258 -206.9072313   28.4441697  -11.2315881
+## Jul 1997   60.1267737   44.1814450 -249.4647258 -206.9072313   28.4441697
+## Aug 1997   76.0521877   60.1267737   44.1814450 -249.4647258 -206.9072313
+## Sep 1997   36.5712767   76.0521877   60.1267737   44.1814450 -249.4647258
+## Oct 1997  146.8079886   36.5712767   76.0521877   60.1267737   44.1814450
+## Nov 1997  200.2140764  146.8079886   36.5712767   76.0521877   60.1267737
+## Dec 1997 -124.2778752  200.2140764  146.8079886   36.5712767   76.0521877
+## Jan 1998   -0.5454763 -124.2778752  200.2140764  146.8079886   36.5712767
+## Feb 1998  -11.2345785   -0.5454763 -124.2778752  200.2140764  146.8079886
+## Mar 1998   28.4456530  -11.2345785   -0.5454763 -124.2778752  200.2140764
+## Apr 1998 -206.9055848   28.4456530  -11.2345785   -0.5454763 -124.2778752
+## May 1998 -249.4777310 -206.9055848   28.4456530  -11.2345785   -0.5454763
+## Jun 1998   44.1812544 -249.4777310 -206.9055848   28.4456530  -11.2345785
+## Jul 1998   60.1330434   44.1812544 -249.4777310 -206.9055848   28.4456530
+## Aug 1998   76.0551945   60.1330434   44.1812544 -249.4777310 -206.9055848
+## Sep 1998   36.5751602   76.0551945   60.1330434   44.1812544 -249.4777310
+## Oct 1998  146.8134290   36.5751602   76.0551945   60.1330434   44.1812544
+## Nov 1998  200.2045679  146.8134290   36.5751602   76.0551945   60.1330434
+## Dec 1998 -124.2736362  200.2045679  146.8134290   36.5751602   76.0551945
+## Jan 1999   -0.5438891 -124.2736362  200.2045679  146.8134290   36.5751602
+## Feb 1999  -11.2296981   -0.5438891 -124.2736362  200.2045679  146.8134290
+## Mar 1999   28.4466036  -11.2296981   -0.5438891 -124.2736362  200.2045679
+## Apr 1999 -206.9066727   28.4466036  -11.2296981   -0.5438891 -124.2736362
+## May 1999 -249.4792670 -206.9066727   28.4466036  -11.2296981   -0.5438891
+## Jun 1999   44.1792712 -249.4792670 -206.9066727   28.4466036  -11.2296981
+## Jul 1999   60.1310456   44.1792712 -249.4792670 -206.9066727   28.4466036
+## Aug 1999   76.0531217   60.1310456   44.1792712 -249.4792670 -206.9066727
+## Sep 1999   36.5809988   76.0531217   60.1310456   44.1792712 -249.4792670
+## Oct 1999  146.8148440   36.5809988   76.0531217   60.1310456   44.1792712
+## Nov 1999  200.1967899  146.8148440   36.5809988   76.0531217   60.1310456
+## Dec 1999 -124.2792491  200.1967899  146.8148440   36.5809988   76.0531217
+## Jan 2000   -0.5378897 -124.2792491  200.1967899  146.8148440   36.5809988
+## Feb 2000  -11.2203012   -0.5378897 -124.2792491  200.1967899  146.8148440
+## Mar 2000   28.4443699  -11.2203012   -0.5378897 -124.2792491  200.1967899
+## Apr 2000 -206.9148156   28.4443699  -11.2203012   -0.5378897 -124.2792491
+## May 2000 -249.4690312 -206.9148156   28.4443699  -11.2203012   -0.5378897
+## Jun 2000   44.1848272 -249.4690312 -206.9148156   28.4443699  -11.2203012
+## Jul 2000   60.1377124   44.1848272 -249.4690312 -206.9148156   28.4443699
+## Aug 2000   76.0565944   60.1377124   44.1848272 -249.4690312 -206.9148156
+## Sep 2000   36.5892133   76.0565944   60.1377124   44.1848272 -249.4690312
+## Oct 2000  146.8106008   36.5892133   76.0565944   60.1377124   44.1848272
+## Nov 2000  200.1936173  146.8106008   36.5892133   76.0565944   60.1377124
+## Dec 2000 -124.2747514  200.1936173  146.8106008   36.5892133   76.0565944
+## Jan 2001   -0.5324645 -124.2747514  200.1936173  146.8106008   36.5892133
+## Feb 2001  -11.2161757   -0.5324645 -124.2747514  200.1936173  146.8106008
+## Mar 2001   28.4436406  -11.2161757   -0.5324645 -124.2747514  200.1936173
+##                    s9          s10          s11          s12
+## Dec 1990   60.1530346   44.1790580 -249.4681974 -206.9221371
+## Jan 1991   76.0439635   60.1530346   44.1790580 -249.4681974
+## Feb 1991   36.5907511   76.0439635   60.1530346   44.1790580
+## Mar 1991  146.8102880   36.5907511   76.0439635   60.1530346
+## Apr 1991  200.1968557  146.8102880   36.5907511   76.0439635
+## May 1991 -124.2766167  200.1968557  146.8102880   36.5907511
+## Jun 1991   -0.5336870 -124.2766167  200.1968557  146.8102880
+## Jul 1991  -11.2186753   -0.5336870 -124.2766167  200.1968557
+## Aug 1991   28.4453626  -11.2186753   -0.5336870 -124.2766167
+## Sep 1991 -206.9130684   28.4453626  -11.2186753   -0.5336870
+## Oct 1991 -249.4696605 -206.9130684   28.4453626  -11.2186753
+## Nov 1991   44.1852425 -249.4696605 -206.9130684   28.4453626
+## Dec 1991   60.1347112   44.1852425 -249.4696605 -206.9130684
+## Jan 1992   76.0531404   60.1347112   44.1852425 -249.4696605
+## Feb 1992   36.5860906   76.0531404   60.1347112   44.1852425
+## Mar 1992  146.8042226   36.5860906   76.0531404   60.1347112
+## Apr 1992  200.1964164  146.8042226   36.5860906   76.0531404
+## May 1992 -124.2879560  200.1964164  146.8042226   36.5860906
+## Jun 1992   -0.5382079 -124.2879560  200.1964164  146.8042226
+## Jul 1992  -11.2253703   -0.5382079 -124.2879560  200.1964164
+## Aug 1992   28.4539567  -11.2253703   -0.5382079 -124.2879560
+## Sep 1992 -206.9050015   28.4539567  -11.2253703   -0.5382079
+## Oct 1992 -249.4679402 -206.9050015   28.4539567  -11.2253703
+## Nov 1992   44.1907205 -249.4679402 -206.9050015   28.4539567
+## Dec 1992   60.1428607   44.1907205 -249.4679402 -206.9050015
+## Jan 1993   76.0463553   60.1428607   44.1907205 -249.4679402
+## Feb 1993   36.5565967   76.0463553   60.1428607   44.1907205
+## Mar 1993  146.8110817   36.5565967   76.0463553   60.1428607
+## Apr 1993  200.2041437  146.8110817   36.5565967   76.0463553
+## May 1993 -124.2808297  200.2041437  146.8110817   36.5565967
+## Jun 1993   -0.5372016 -124.2808297  200.2041437  146.8110817
+## Jul 1993  -11.2176255   -0.5372016 -124.2808297  200.2041437
+## Aug 1993   28.4542297  -11.2176255   -0.5372016 -124.2808297
+## Sep 1993 -206.8972058   28.4542297  -11.2176255   -0.5372016
+## Oct 1993 -249.4697807 -206.8972058   28.4542297  -11.2176255
+## Nov 1993   44.1808456 -249.4697807 -206.8972058   28.4542297
+## Dec 1993   60.1507210   44.1808456 -249.4697807 -206.8972058
+## Jan 1994   76.0431681   60.1507210   44.1808456 -249.4697807
+## Feb 1994   36.5556304   76.0431681   60.1507210   44.1808456
+## Mar 1994  146.8034783   36.5556304   76.0431681   60.1507210
+## Apr 1994  200.2017994  146.8034783   36.5556304   76.0431681
+## May 1994 -124.2818374  200.2017994  146.8034783   36.5556304
+## Jun 1994   -0.5429380 -124.2818374  200.2017994  146.8034783
+## Jul 1994  -11.2228725   -0.5429380 -124.2818374  200.2017994
+## Aug 1994   28.4487297  -11.2228725   -0.5429380 -124.2818374
+## Sep 1994 -206.8921216   28.4487297  -11.2228725   -0.5429380
+## Oct 1994 -249.4612885 -206.8921216   28.4487297  -11.2228725
+## Nov 1994   44.1887130 -249.4612885 -206.8921216   28.4487297
+## Dec 1994   60.1441030   44.1887130 -249.4612885 -206.8921216
+## Jan 1995   76.0378859   60.1441030   44.1887130 -249.4612885
+## Feb 1995   36.5512944   76.0378859   60.1441030   44.1887130
+## Mar 1995  146.7992480   36.5512944   76.0378859   60.1441030
+## Apr 1995  200.1981147  146.7992480   36.5512944   76.0378859
+## May 1995 -124.2713033  200.1981147  146.7992480   36.5512944
+## Jun 1995   -0.5419662 -124.2713033  200.1981147  146.7992480
+## Jul 1995  -11.2215662   -0.5419662 -124.2713033  200.1981147
+## Aug 1995   28.4453883  -11.2215662   -0.5419662 -124.2713033
+## Sep 1995 -206.8936643   28.4453883  -11.2215662   -0.5419662
+## Oct 1995 -249.4631312 -206.8936643   28.4453883  -11.2215662
+## Nov 1995   44.1887124 -249.4631312 -206.8936643   28.4453883
+## Dec 1995   60.1343574   44.1887124 -249.4631312 -206.8936643
+## Jan 1996   76.0362202   60.1343574   44.1887124 -249.4631312
+## Feb 1996   36.5538189   76.0362202   60.1343574   44.1887124
+## Mar 1996  146.7908221   36.5538189   76.0362202   60.1343574
+## Apr 1996  200.1977780  146.7908221   36.5538189   76.0362202
+## May 1996 -124.2690591  200.1977780  146.7908221   36.5538189
+## Jun 1996   -0.5467558 -124.2690591  200.1977780  146.7908221
+## Jul 1996  -11.2194903   -0.5467558 -124.2690591  200.1977780
+## Aug 1996   28.4396503  -11.2194903   -0.5467558 -124.2690591
+## Sep 1996 -206.9010411   28.4396503  -11.2194903   -0.5467558
+## Oct 1996 -249.4639573 -206.9010411   28.4396503  -11.2194903
+## Nov 1996   44.1768742 -249.4639573 -206.9010411   28.4396503
+## Dec 1996   60.1329844   44.1768742 -249.4639573 -206.9010411
+## Jan 1997   76.0441018   60.1329844   44.1768742 -249.4639573
+## Feb 1997   36.5615294   76.0441018   60.1329844   44.1768742
+## Mar 1997  146.7979956   36.5615294   76.0441018   60.1329844
+## Apr 1997  200.2072667  146.7979956   36.5615294   76.0441018
+## May 1997 -124.2728099  200.2072667  146.7979956   36.5615294
+## Jun 1997   -0.5471774 -124.2728099  200.2072667  146.7979956
+## Jul 1997  -11.2315881   -0.5471774 -124.2728099  200.2072667
+## Aug 1997   28.4441697  -11.2315881   -0.5471774 -124.2728099
+## Sep 1997 -206.9072313   28.4441697  -11.2315881   -0.5471774
+## Oct 1997 -249.4647258 -206.9072313   28.4441697  -11.2315881
+## Nov 1997   44.1814450 -249.4647258 -206.9072313   28.4441697
+## Dec 1997   60.1267737   44.1814450 -249.4647258 -206.9072313
+## Jan 1998   76.0521877   60.1267737   44.1814450 -249.4647258
+## Feb 1998   36.5712767   76.0521877   60.1267737   44.1814450
+## Mar 1998  146.8079886   36.5712767   76.0521877   60.1267737
+## Apr 1998  200.2140764  146.8079886   36.5712767   76.0521877
+## May 1998 -124.2778752  200.2140764  146.8079886   36.5712767
+## Jun 1998   -0.5454763 -124.2778752  200.2140764  146.8079886
+## Jul 1998  -11.2345785   -0.5454763 -124.2778752  200.2140764
+## Aug 1998   28.4456530  -11.2345785   -0.5454763 -124.2778752
+## Sep 1998 -206.9055848   28.4456530  -11.2345785   -0.5454763
+## Oct 1998 -249.4777310 -206.9055848   28.4456530  -11.2345785
+## Nov 1998   44.1812544 -249.4777310 -206.9055848   28.4456530
+## Dec 1998   60.1330434   44.1812544 -249.4777310 -206.9055848
+## Jan 1999   76.0551945   60.1330434   44.1812544 -249.4777310
+## Feb 1999   36.5751602   76.0551945   60.1330434   44.1812544
+## Mar 1999  146.8134290   36.5751602   76.0551945   60.1330434
+## Apr 1999  200.2045679  146.8134290   36.5751602   76.0551945
+## May 1999 -124.2736362  200.2045679  146.8134290   36.5751602
+## Jun 1999   -0.5438891 -124.2736362  200.2045679  146.8134290
+## Jul 1999  -11.2296981   -0.5438891 -124.2736362  200.2045679
+## Aug 1999   28.4466036  -11.2296981   -0.5438891 -124.2736362
+## Sep 1999 -206.9066727   28.4466036  -11.2296981   -0.5438891
+## Oct 1999 -249.4792670 -206.9066727   28.4466036  -11.2296981
+## Nov 1999   44.1792712 -249.4792670 -206.9066727   28.4466036
+## Dec 1999   60.1310456   44.1792712 -249.4792670 -206.9066727
+## Jan 2000   76.0531217   60.1310456   44.1792712 -249.4792670
+## Feb 2000   36.5809988   76.0531217   60.1310456   44.1792712
+## Mar 2000  146.8148440   36.5809988   76.0531217   60.1310456
+## Apr 2000  200.1967899  146.8148440   36.5809988   76.0531217
+## May 2000 -124.2792491  200.1967899  146.8148440   36.5809988
+## Jun 2000   -0.5378897 -124.2792491  200.1967899  146.8148440
+## Jul 2000  -11.2203012   -0.5378897 -124.2792491  200.1967899
+## Aug 2000   28.4443699  -11.2203012   -0.5378897 -124.2792491
+## Sep 2000 -206.9148156   28.4443699  -11.2203012   -0.5378897
+## Oct 2000 -249.4690312 -206.9148156   28.4443699  -11.2203012
+## Nov 2000   44.1848272 -249.4690312 -206.9148156   28.4443699
+## Dec 2000   60.1377124   44.1848272 -249.4690312 -206.9148156
+## Jan 2001   76.0565944   60.1377124   44.1848272 -249.4690312
+## Feb 2001   36.5892133   76.0565944   60.1377124   44.1848272
+## Mar 2001  146.8106008   36.5892133   76.0565944   60.1377124
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 5-6 Tab 5-2 5-4 5-5-2.pdf}
+
+\begin{verbatim}
+##                      ME     RMSE      MAE         MPE     MAPE      MASE
+## Training set  0.1382018 56.49150 45.22527 -0.07920944 2.579613 0.5482385
+## Test set     33.6684422 76.65107 62.16977  1.58152634 3.122042 0.7536464
+##                    ACF1 Theil's U
+## Training set 0.06063493        NA
+## Test set     0.61655528 0.4430438
+\end{verbatim}
+
+\begin{verbatim}
+##                    ME     RMSE      MAE        MPE     MAPE      MASE
+## Training set  1.98570 56.86248 45.21332 0.02883941 2.576978 0.5480937
+## Test set     49.72735 88.62810 73.96379 2.39118826 3.707185 0.8966182
+##                    ACF1 Theil's U
+## Training set 0.06113138        NA
+## Test set     0.65425349 0.5135193
+\end{verbatim}
+
+\section{Smoothening}\label{smoothening-1}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 6-2 Tab 6-1-1.pdf}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = train.ts ~ trend)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -411.29 -114.02   16.06  129.28  306.35 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 1750.3595    29.0729  60.206   <2e-16 ***
+## trend          0.3514     0.4069   0.864     0.39    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 160.2 on 121 degrees of freedom
+## Multiple R-squared:  0.006125,   Adjusted R-squared:  -0.002089 
+## F-statistic: 0.7456 on 1 and 121 DF,  p-value: 0.3896
+\end{verbatim}
+
+\subsection{Box-Cox Transformation}\label{box-cox-transformation}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 6-3 6-5-1.pdf}
+
+\begin{verbatim}
+##           Jan      Feb      Mar      Apr      May      Jun      Jul
+## 1991 7.443615 7.390543 7.587166 7.502002 7.588305 7.529598 7.570371
+## 1992 7.386983 7.350573 7.544979 7.578647 7.541531 7.392057 7.551349
+## 1993 7.441472 7.389277 7.515731 7.579190 7.558613 7.540302 7.566833
+## 1994 7.354596 7.361349 7.550997 7.514194 7.512644 7.481981 7.532360
+## 1995 7.344987 7.311168 7.494606 7.457549 7.480059 7.473755 7.490895
+## 1996 7.231112 7.215866 7.351527 7.383008 7.436438 7.434365 7.515081
+## 1997 7.241787 7.223799 7.442798 7.411317 7.474717 7.482006 7.567459
+## 1998 7.359041 7.253252 7.470020 7.509298 7.519307 7.509863 7.584860
+## 1999 7.377401 7.345238 7.513345 7.517369 7.521046 7.530937 7.583626
+## 2000 7.340615 7.388283 7.559840 7.586546 7.597046 7.605772 7.627542
+## 2001 7.428421 7.416621 7.604859                                    
+##           Aug      Sep      Oct      Nov      Dec
+## 1991 7.607513 7.375041 7.452938 7.423967 7.503214
+## 1992 7.599257 7.440673 7.501082 7.529192 7.536429
+## 1993 7.598984 7.422279 7.468985 7.450299 7.458355
+## 1994 7.553081 7.429896 7.483551 7.482116 7.486249
+## 1995 7.536268 7.359664 7.406679 7.422153 7.412670
+## 1996 7.571769 7.346914 7.430415 7.362775 7.438638
+## 1997 7.604922 7.387662 7.480941 7.457245 7.493666
+## 1998 7.560937 7.420338 7.490794 7.504785 7.521185
+## 1999 7.575073 7.382356 7.497575 7.523108 7.515581
+## 2000 7.648488 7.508626 7.589334 7.591563 7.600979
+## 2001
+\end{verbatim}
+
+\subsection{Smoothening with various Permuations of Interaction
+Terms}\label{smoothening-with-various-permuations-of-interaction-terms}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = train.ts ~ trend + I(trend^2))
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -344.79 -101.86   40.89   98.54  279.81 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 1888.88401   40.91521  46.166  < 2e-16 ***
+## trend         -6.29780    1.52327  -4.134 6.63e-05 ***
+## I(trend^2)     0.05362    0.01190   4.506 1.55e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 148.8 on 120 degrees of freedom
+## Multiple R-squared:  0.1499, Adjusted R-squared:  0.1358 
+## F-statistic: 10.58 on 2 and 120 DF,  p-value: 5.844e-05
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = train.ts ~ season)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -276.165  -52.934    5.868   54.544  215.081 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1573.97      30.58  51.475  < 2e-16 ***
+## season2       -42.93      43.24  -0.993   0.3230    
+## season3       260.77      43.24   6.030 2.19e-08 ***
+## season4       245.09      44.31   5.531 2.14e-07 ***
+## season5       278.22      44.31   6.279 6.81e-09 ***
+## season6       233.46      44.31   5.269 6.82e-07 ***
+## season7       345.33      44.31   7.793 3.79e-12 ***
+## season8       396.66      44.31   8.952 9.19e-15 ***
+## season9        75.76      44.31   1.710   0.0901 .  
+## season10      200.61      44.31   4.527 1.51e-05 ***
+## season11      192.36      44.31   4.341 3.14e-05 ***
+## season12      230.42      44.31   5.200 9.18e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 101.4 on 111 degrees of freedom
+## Multiple R-squared:  0.6348, Adjusted R-squared:  0.5986 
+## F-statistic: 17.54 on 11 and 111 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Tab 6-3 Fig 6-7 Tab 6-5-1.pdf}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = train.ts ~ trend + I(sin(2 * pi * trend/12)) + 
+##     I(cos(2 * pi * trend/12)))
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -318.34  -96.30    8.04   89.73  307.89 
+## 
+## Coefficients:
+##                            Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               1748.0335    25.0477  69.788  < 2e-16 ***
+## trend                        0.4229     0.3507   1.206  0.23015    
+## I(sin(2 * pi * trend/12))  -48.2666    17.5260  -2.754  0.00681 ** 
+## I(cos(2 * pi * trend/12)) -106.5245    17.6773  -6.026 1.93e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 137.9 on 119 degrees of freedom
+## Multiple R-squared:  0.2762, Adjusted R-squared:  0.2579 
+## F-statistic: 15.14 on 3 and 119 DF,  p-value: 2.088e-08
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Tab 6-3 Fig 6-7 Tab 6-5-2.pdf}
+
+\begin{verbatim}
+## 
+## Call:
+## tslm(formula = train.ts ~ trend + I(trend^2) + season)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -213.775  -39.363    9.711   42.422  152.187 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.697e+03  2.768e+01  61.318  < 2e-16 ***
+## trend       -7.156e+00  7.293e-01  -9.812  < 2e-16 ***
+## I(trend^2)   6.074e-02  5.698e-03  10.660  < 2e-16 ***
+## season2     -4.325e+01  3.024e+01  -1.430  0.15556    
+## season3      2.600e+02  3.024e+01   8.598 6.60e-14 ***
+## season4      2.606e+02  3.102e+01   8.401 1.83e-13 ***
+## season5      2.938e+02  3.102e+01   9.471 6.89e-16 ***
+## season6      2.490e+02  3.102e+01   8.026 1.26e-12 ***
+## season7      3.606e+02  3.102e+01  11.626  < 2e-16 ***
+## season8      4.117e+02  3.102e+01  13.270  < 2e-16 ***
+## season9      9.032e+01  3.102e+01   2.911  0.00437 ** 
+## season10     2.146e+02  3.102e+01   6.917 3.29e-10 ***
+## season11     2.057e+02  3.103e+01   6.629 1.34e-09 ***
+## season12     2.429e+02  3.103e+01   7.829 3.44e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 70.92 on 109 degrees of freedom
+## Multiple R-squared:  0.8246, Adjusted R-squared:  0.8037 
+## F-statistic: 39.42 on 13 and 109 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Tab 6-4 Fig 6-8-1.pdf}
+
+\begin{verbatim}
+## null device 
+##           1
+\end{verbatim}
+
+\section{Auto Correlations Plot and
+Treatment}\label{auto-correlations-plot-and-treatment}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 6-11-1.pdf} \#\#\#
+Accounitng for Seasonality and Autocorrelation
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 6-12-1.pdf}
+
+\begin{verbatim}
+## , , 1
+## 
+##             [,1]
+##  [1,] 1.00000000
+##  [2,] 0.60405883
+##  [3,] 0.44983171
+##  [4,] 0.33730830
+##  [5,] 0.25329034
+##  [6,] 0.21565844
+##  [7,] 0.15901326
+##  [8,] 0.17676683
+##  [9,] 0.17553762
+## [10,] 0.17140882
+## [11,] 0.10739472
+## [12,] 0.11976519
+## [13,] 0.08512942
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 6-13 Fig 6-14-1.pdf}
+
+\begin{verbatim}
+## null device 
+##           1
+\end{verbatim}
+
+\begin{verbatim}
+## Series: train.lm.trend.season$residuals 
+## ARIMA(1,0,0) with non-zero mean 
+## 
+## Coefficients:
+##          ar1     mean
+##       0.5998   0.3728
+## s.e.  0.0712  11.8408
+## 
+## sigma^2 estimated as 2876:  log likelihood=-663.54
+## AIC=1333.08   AICc=1333.29   BIC=1341.52
+## 
+## Training set error measures:
+##                      ME     RMSE     MAE      MPE     MAPE      MASE
+## Training set -0.1223159 53.19141 39.8277 103.3885 175.2219 0.5721356
+##                     ACF1
+## Training set -0.07509305
+\end{verbatim}
+
+\subsubsection{Fitting Neural Nets to
+forecasting}\label{fitting-neural-nets-to-forecasting}
+
+\begin{verbatim}
+## [1] 159
+\end{verbatim}
+
+\begin{verbatim}
+## a 12-7-1 network with 99 weights
+## options were - linear output units 
+##   b->h1  i1->h1  i2->h1  i3->h1  i4->h1  i5->h1  i6->h1  i7->h1  i8->h1 
+##    7.62    3.26   -0.51   -7.79   -0.40    4.18   -3.67    4.26   -6.99 
+##  i9->h1 i10->h1 i11->h1 i12->h1 
+##    4.26   -0.37    1.22    4.58 
+##   b->h2  i1->h2  i2->h2  i3->h2  i4->h2  i5->h2  i6->h2  i7->h2  i8->h2 
+##    0.84   -0.47    4.11   -6.37   -7.74    8.22   -6.46    2.65   -6.84 
+##  i9->h2 i10->h2 i11->h2 i12->h2 
+##    8.29    1.42    5.43   -0.05 
+##   b->h3  i1->h3  i2->h3  i3->h3  i4->h3  i5->h3  i6->h3  i7->h3  i8->h3 
+##    7.45   -7.59   -4.51    5.28   -2.60   -2.31   -7.64    1.37   -1.36 
+##  i9->h3 i10->h3 i11->h3 i12->h3 
+##    3.91    4.33   -1.65    0.83 
+##   b->h4  i1->h4  i2->h4  i3->h4  i4->h4  i5->h4  i6->h4  i7->h4  i8->h4 
+##   -4.48    1.53   -1.92   -1.55   -6.22    8.73   -2.41   -1.68   -0.84 
+##  i9->h4 i10->h4 i11->h4 i12->h4 
+##    9.37  -10.92    5.00    4.68 
+##   b->h5  i1->h5  i2->h5  i3->h5  i4->h5  i5->h5  i6->h5  i7->h5  i8->h5 
+##    0.27   -2.11   -3.05   -3.50   -5.15    0.64    8.94   -6.71   -0.37 
+##  i9->h5 i10->h5 i11->h5 i12->h5 
+##   12.48   -2.84   -0.30   -0.55 
+##   b->h6  i1->h6  i2->h6  i3->h6  i4->h6  i5->h6  i6->h6  i7->h6  i8->h6 
+##   -6.31   -4.68    1.54   -7.47    3.65    3.42    4.15    0.39    0.70 
+##  i9->h6 i10->h6 i11->h6 i12->h6 
+##    0.28   -5.94   -4.73   -0.23 
+##   b->h7  i1->h7  i2->h7  i3->h7  i4->h7  i5->h7  i6->h7  i7->h7  i8->h7 
+##    0.70    7.03   -8.27    2.06  -13.59   -0.39    8.68    2.16    3.89 
+##  i9->h7 i10->h7 i11->h7 i12->h7 
+##    9.90   -1.84   -4.01   -4.10 
+##   b->o  h1->o  h2->o  h3->o  h4->o  h5->o  h6->o  h7->o 
+##   0.60   1.05  -1.05  -1.11   1.33  -1.64  -1.58   1.28
+\end{verbatim}
+
+\begin{verbatim}
+##                      ME      RMSE       MAE         MPE      MAPE
+## Training set  0.1345029   4.60624  3.355614 0.001476058 0.1921153
+## Test set     87.7655536 121.60742 97.251127 4.250144613 4.7525810
+##                    MASE        ACF1 Theil's U
+## Training set 0.04067807 -0.03689506        NA
+## Test set     1.17891637  0.62628789 0.6955393
+\end{verbatim}
+
+\includegraphics{FCAS_files/figure-latex/Amtrak Fig 7-7-1.pdf}
+
+\begin{verbatim}
+## Series: train.ts 
+## Model:  NNAR(2,1,2)[12] 
+## Call:   nnetar(y = train.ts)
+## 
+## Average of 20 networks, each of which is
+## a 3-2-1 network with 11 weights
+## options were - linear output units 
+## 
+## sigma^2 estimated as 6766
+\end{verbatim}
+
+\begin{verbatim}
+##                       ME      RMSE       MAE        MPE     MAPE      MASE
+## Training set  -0.3492673  82.25378  67.07129 -0.2610314 3.875977 0.8130646
+## Test set     -37.1540134 130.87578 100.48248 -2.2095656 5.236845 1.2180881
+##                   ACF1 Theil's U
+## Training set 0.3979050        NA
+## Test set     0.3529398  0.762112
+\end{verbatim}
+
+
+\end{document}

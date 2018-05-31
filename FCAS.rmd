@@ -3,7 +3,108 @@ title: "Amtrack Ridership Forecasting"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
+**Amtrak**, a US railway company, routinely collects data on ridership. This is a subjective exercise
+exercise is built on series of monthly Amtrak ridership between January 1991 and
+March 2004 in the United States.
+
+Data is in public domain
+[here](https://docs.google.com/open?id=0B76mgCvz1US5Z1lGRkZQZ1pRLTQ).
+
+## Process
+
+The Forecasting Process that we undertake is noted as follows:
+
+![Forecasting Process](C:/Users/Administrator/Downloads/ForecastingProcess.png)
+
+Forecasting Process
+
+## Goals
+
+1.  Forecast monthly user ridership on its trains for the purpose of Pricing.
+    Using demand data to determine Pricing is called "revenue management" and is
+    a popular practice by airlines and hotel chains. It is a Predictive Goal.
+
+2.  Impact Assessment: Evaluating the effect of an event on the timeline such as
+    Airport closure due to inclement weather, or the opening on new large
+    national highway. This goal is retrospective in nature, and is therefore
+    descriptive or even explanatory. Analysis would compare the series before
+    and after the event, with no direct interest in future values of the series.
+    Note that these goals are also geography specific and would therefore
+    require using ridership data at a finer level of geography within United
+    States.
+
+3.  Identifying and quantifying Demand during different seasons for planning the
+    number and frequency of trains needed during different seasons. If the model
+    is only aimed at producing monthly indexes of demand, then it is a
+    descriptive goal. In contrast, if the model will be used to forecast
+    seasonal demand for future years then it is a predictive task.
+
+4.  Finally, the Amtrack ridership data may be used by national agencies, such
+    as Bureau of Transport Statistics to evaluate trends in transportation modes
+    over the years. Whether it is descriptive or predictive goal depends on what
+    the analysis will be used for. If it is used for the purpose of reporting
+    past trends, then it is descriptive. If the purpose is forecasting future
+    trends, then it is predictive goal.
+
+### Forecast Horizon
+
+Forecast Horizon is the *k* number of periods ahead that we must forecast, and
+$F_{t+k}$ is a *k*-step-ahead forecast. In Amtrack ridership example, one month ahead
+forecast $F_{t+1}$ mightbe sufficient for Revenue management for creating flexible
+pricing. Whereas longer term forecasts, such as three month ahead forecast
+$F_{t+3}$ are more likely to be needed for scheduling and procurement purpose.
+
+### Forecast Updating
+
+Timeliness of data collection and transfer directly affect the forecast horizon.
+Whether improving the timeliness of data collection and transfer is possible or
+not, its implications on forecasting must be recognized at goal definition
+stage. Refreshing of forecasts based on new data is called *roll-forward
+forecasting*.
+
+### Forecast Use
+
+Understanding how the forecast will be used, perhaps by different stakeholders,
+is critical for generating forecasts of the right type and with a useful
+accuracy level. Should the forecasts be binary(event/non-event)? Does
+over-production cost more or less than under-production? Will the forecast be
+used directly or will they be adjusted in some way before use? Will the forecast
+be presented to management or to the Technical department? Answers to such
+questions are necessary to choose appropriate data, methods and evaluation
+schemes.
+
+
+### Libraries
+
+We will use [Rob J Hyndman's](https://robjhyndman.com/about/)
+[forecast](https://www.rdocumentation.org/packages/forecast/versions/8.3)
+package
+
+```{r echo=TRUE}
+require(tidyverse) 
+require(forecast)
+require(xtable)
+require(knitr)
+require(zoo)
+```
+Different kinds of Forecasting
+
+### Timeplot
+
+A timeplot of monthly Amtrack ridership is shown in Figure 2.3. Observing the
+plot reveals nature of time series components.
+
+-   Values Scale: Thousands ofriders
+
+-   Overall Level: 1,800,000 riders/month
+
+-   Trend: Slight U-shaped
+
+-   Seasonality: Pronounced, Annual, Peaks: July, August
+
+Figure 2.3: Monthly ridership on AMtrack Trains (in thousands) from Jan 1991 to March 2004
 
 ```{r Amtrak Fig 2-3, echo=FALSE, warning=FALSE, message=FALSE}
 Amtrak.data <- read.csv("Amtrak data.csv")
@@ -12,10 +113,18 @@ ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991,1), end = c(2004, 3), f
 # Figure 2-3
 plot(ridership.ts, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300), bty = "l")
 ```
-Line plot of Ridership  - The dataset
 
 
-#Linear Fitting and Smoothening
+### Trend and Zooming/Window
+
+To fit a quadratic trend, run the forecast package's linear regression model for
+time series, called tslm. The y value is ridership and two x values are trend
+and square of trend. The function I treats square of trend as-is. Plot time
+series and its fitted regression line in the top panel of figure 2.4 The bottom
+panel shows a zoomed-in view of timeseries from January 1997 to December 2000.
+Use the window function to identify a subset of time series.
+
+
 ```{r Amtrak Fig 2-6, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
 
@@ -32,7 +141,22 @@ plot(ridership.ts.zoom, xlab = "Time", ylab = "Ridership", ylim = c(1300, 2300),
 
 ```
 
-# Partitioning
+### Partitioning the Data
+
+Temporal partitioning: Partitioning the data in Training and Validation period
+is a linear process unlike that used in Cross sectional data which must be
+randomly selected. A random selection on a timeline will cause a "hole". In the
+same vein, a third partition - "test"- is not advised as the impact of recency
+on forecasting is much higher. The latest partition, if made, will affect the
+forecasting detrimentally. Finally, the last difference is that in Time series,
+Training and Validation dataset are recombined before attempting to forecast
+future values.
+
+Define the number of months of training and validation datasets, `nValid` and
+`nTrain`, respectively. Use the `time` and `window` function to create the
+training and validation sets. Fit a model (here, a linear regression model) to
+the training set. Use the `forecast` function to make predictions of time series
+in the validation period. Plot the predictions.
 
 ```{r Amtrak Fig 3-1, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
@@ -53,6 +177,7 @@ arrows(2004.5 - 3,2450,2004,2450,code=3,length=0.1,lwd=1,angle=30)
 arrows(2004.5,2450,2006,2450,code=3,length=0.1,lwd=1,angle=30)
 
 ```
+
 
 ```{r Amtrak Fig 3-2, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
@@ -80,8 +205,35 @@ arrows(2004 - 3, 2450, 1991.25, 2450, code = 3, length = 0.1, lwd = 1,angle = 30
 arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
 arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
 ```
+### Computing Predictive Measures
 
+-   Forecast Error/ Residual
 
+-   MAE/MAD
+
+-   Average Error
+
+-   MAPE
+
+-   RMSE
+
+-   Zero Counts affecting MAPE
+
+-   MASE
+
+-   Forecast accuracy vs Profitability: Balancing the cost and perspective of
+    Type One and Type Two Errors
+    
+```{r Amtrak Table 3.0, echo=FALSE, warning=FALSE, message=FALSE}
+accuracy(ridership.lm.pred$mean, valid.ts)
+```
+### Residuals
+
+Use the `names` function to fund out which elements are included with the
+`forecast` object called `ridership.lm.pred`. The model's residuals are forecast
+error in training period. Subtracting the model's `mean` (or forecasts) from
+`valid.ts` (or actuals) in the validation period gives the forecast error in the
+validation period.
 ```{r Amtrak Fig 3-3, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
 
@@ -109,6 +261,14 @@ arrows(2004.5 - 3, 450, 2004, 450, code = 3, length = 0.1, lwd = 1,angle = 30)
 arrows(2004.5, 450, 2006, 450, code = 3, length = 0.1, lwd = 1, angle = 30)
 ```
 
+Figure 3.3: Timeplot of forecast errors (residuals) from a quadratic trend model
+applied to the Amtrack ridership data.
+
+Put the model's residuals into the `hist` function to plot the histogram of, or
+frequency of forecast errors in each of seven (automatically and equally sized)
+bins.
+
+
 ```{r Amtrak Fig 3-4, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
 
@@ -127,6 +287,17 @@ names(ridership.lm.pred)
 hist(ridership.lm.pred$residuals,  ylab = "Frequency", xlab = "Forecast Error", bty = "l", main = "")
 
 ```
+
+Figure 3.4: Histogram of forecast errors in the Training period from a quadratic
+trend model applied to the Amtrack ridership data.
+
+
+
+Prediction Intervals: When errors are not normally distributed, forecast errors
+can be obtained from the training period to construct a prediction interval in
+the validation period and future. For example, a 95% prediction interval can be
+constructed by using the 5th and 95th percentiles from the sample of forecast
+errors.
 
 ```{r Amtrak Fig 3-5, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
@@ -156,6 +327,12 @@ arrows(2004.5 - 3, 2450, 2004, 2450, code = 3, length = 0.1, lwd = 1,angle = 30)
 arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
 ```
 
+Figure 3.5: Point forecasts and 95% prediction intervals in the validation
+period gained from a quadratic trend model applied to the Amtrack ridership
+data. (`level = 95`)
+
+
+
 ```{r Amtrak Fig 3-6, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
 
@@ -173,7 +350,7 @@ naive.roll <- ts(Amtrak.data$Ridership[fixed.nTrain:(fixed.nTrain + fixed.nValid
 plot(train.ts, ylim = c(1300, 2600),  ylab = "Ridership", xlab = "Time", bty = "l", xaxt = "n", xlim = c(1991,2006.25), main = "")
 axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
 lines(naive.fixed$mean, lwd = 2, col = "blue", lty = 2)
-lines(naive.roll, lwd = 2, col = "blue", lty = 2)
+lines(naive.roll, lwd = 2, col = "green", lty = 2)
 lines(valid.ts)
 lines(c(2004.25 - 3, 2004.25 - 3), c(0, 3500)) 
 lines(c(2004.25, 2004.25), c(0, 3500))
@@ -187,8 +364,116 @@ arrows(2004.5, 2450, 2006, 2450, code = 3, length = 0.1, lwd = 1, angle = 30)
 
 ```
 
-# Predictions
+Figure 3.7: Naïve forecasts using a fixed validation period (Dashed horizontal
+line in blue) vs one-step-ahead Naïve forecasts using monthly roll-forward
+validation period (other dashed line in green) for Amtrack ridership data. The
+actual values are plotted with a smooth line.
 
+```{r Amtrak Table 3-3, echo=FALSE, warning=FALSE, message=FALSE}
+require(forecast)
+
+Amtrak.data <- read.csv("Amtrak data.csv")
+ridership.ts <- ts(Amtrak.data$Ridership, start = c(1991, 1), end = c(2004, 3), freq = 12)
+
+fixed.nValid <- 36
+fixed.nTrain <- length(ridership.ts) - fixed.nValid
+
+stepsAhead <- 1
+error <- rep(0, fixed.nValid -stepsAhead+1)
+percent.error <- rep(0, fixed.nValid -stepsAhead+1)
+for(j in fixed.nTrain:(fixed.nTrain+fixed.nValid-stepsAhead) ){
+  train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, j))
+  valid.ts <- window(ridership.ts, start = c(1991,  j + stepsAhead), end = c(1991,  j + stepsAhead))
+  naive.pred <- naive(train.ts, h = stepsAhead )
+  error[j - fixed.nTrain + 1] <- valid.ts -naive.pred$mean[stepsAhead]
+  percent.error[j - fixed.nTrain + 1] <- error[j - fixed.nTrain + 1]/valid.ts
+}
+
+mean(abs(error))
+sqrt(mean(error^2))
+mean(abs(percent.error))
+```
+
+
+```{r Amtrak Table 3-4 and 3-5, echo=FALSE, warning=FALSE, message=FALSE}
+
+fixed.nValid <- 36
+fixed.nTrain <- length(ridership.ts) - fixed.nValid
+
+train.ts <- window(ridership.ts, start = c(1991, 1), end = c(1991, fixed.nTrain))
+valid.ts <- window(ridership.ts, start = c(1991, fixed.nTrain + 1), 
+                   end = c(1991, fixed.nTrain + fixed.nValid))
+naive.pred <- naive(train.ts, h = fixed.nValid)
+snaive.pred <- snaive(train.ts, h = fixed.nValid)
+accuracy(naive.pred, valid.ts)
+accuracy(snaive.pred, valid.ts)
+
+
+
+# note to self
+# These are mts objects == matrixed time series
+# colnames, rownames 
+# cbind, rbind
+
+
+#glimpse(naive.pred)
+table3_4 <- cbind(window(ridership.ts, start = c(2001, 4), end = c(2004, 3)),
+                  window(naive.pred$mean, start = c(2001, 4), end = c(2004, 3)),
+                  window(snaive.pred$mean, start = c(2001, 4), end = c(2004, 3))
+                  ) 
+
+colnames(table3_4) <- c("Actual", "Naive", "Seasonal Naive")
+# kable(table3_4)
+
+xtable(table3_4)
+head(table3_4)
+
+
+# # ts.intersect and ts.union can also be applicable.
+# table3_4_1 <- ts.intersect(window(ridership.ts, start = c(2001, 4), end = c(2004, 3)),
+#                   window(naive.pred$mean, start = c(2001, 4), end = c(2004, 3)),
+#                   window(snaive.pred$mean, start = c(2001, 4), end = c(2004, 3)),
+#                   dframe = FALSE)
+# 
+# colnames(table3_4_1) <- c("Actual", "Naive", "Seasonal Naive")
+# kable(table3_4_1)
+# 
+# # zoo transformation to do the same work
+# table3_4_2_1  <- as.zoo(window(ridership.ts, start = c(2001, 4), end = c(2004, 3)))
+# table3_4_2_1
+# table3_4_2_2  <- as.zoo(window(naive.pred$mean, start = c(2001, 4), end = c(2004, 3)))
+# table3_4_2_3  <- as.zoo(window(snaive.pred$mean, start = c(2001, 4), end = c(2004, 3)))
+#               
+#                   
+# table3_4_2 <- merge(table3_4_2_1, table3_4_2_2, table3_4_2_3)
+# colnames(table3_4_2) <- c("Actual", "Naive", "Seasonal Naive")
+# head(table3_4_2)
+
+
+## Acuracy Calculations
+na3_4 <-  accuracy(naive.pred, valid.ts)
+sna3_4 <- accuracy(snaive.pred, valid.ts)
+
+
+table3_5 <- rbind(na3_4[2,], sna3_4[2,colnames(na3_4)])
+rownames(table3_5) <- c("Naive", "Seasonal Naive")
+# table3_5
+
+kable(table3_5[,2:6], caption = "Comparison of Accuracy Metrics")
+
+
+
+
+
+```
+Table 3.4: Naïve and season naïve forecasts for fixed validation period
+(ridership data)
+
+Table 3.5: Performance of naïve vs seasonal naïve forecasts using fixed
+partitioning
+
+
+# Smoothening 
 ```{r Amtrak Fig 5-2, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
 library(zoo)
@@ -595,7 +880,7 @@ Acf(ridership.24.ts, lag.max = 12, main = "")
 
 
 ```
-
+### Accounitng for Seasonality and Autocorrelation
 
 ```{r Amtrak Fig 6-12, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)
@@ -656,6 +941,8 @@ summary(train.res.arima)
 Acf(train.res.arima$residuals, lag.max = 12, main = "")
 
 ```
+
+### Fitting Neural Nets to forecasting
 
 ```{r Amtrak Fig 7-7, echo=FALSE, warning=FALSE, message=FALSE}
 library(forecast)  
